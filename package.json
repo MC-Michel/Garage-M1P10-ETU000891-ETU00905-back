@@ -1,0 +1,19 @@
+{
+  "name": "garage_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MC-Michel/garage_server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MC-Michel/garage_server/issues"
+  },
+  "homepage": "https://github.com/MC-Michel/garage_server#readme"
+}
