@@ -1,19 +1,17 @@
 {
-  "name": "garage_server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "garage-server",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon ./bin/www"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/MC-Michel/garage_server.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/MC-Michel/garage_server/issues"
-  },
-  "homepage": "https://github.com/MC-Michel/garage_server#readme"
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "mongodb": "^4.13.0",
+    "morgan": "~1.9.1"
+  }
 }
