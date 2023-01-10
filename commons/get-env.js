@@ -1,10 +1,7 @@
-const envFile = process.env.NODE_ENV === 'production' ? 'environment.prod' : 'environment';
-
-const CustomError = require("../errors/custom-error")
-const environment= require('../environments/'+envFile)
-
-module.exports = function (key){
-    if( environment[key] === null ||  environment[key] === undefined)
+const CustomError = require("../errors/custom-error") 
+require('dotenv').config()
+module.exports = function(key){
+    if( process.env[key] === null ||  process.env[key] === undefined)
         throw new CustomError("unknown env key: "+key)
-    return  environment[key];
+    return process.env[key];
 }

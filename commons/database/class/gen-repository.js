@@ -2,9 +2,8 @@
 class GenRepository {
     constructor(entityClass){
 
-    }
-    //entity: instance or instance array
-    insert(entity){
+    } 
+    insert(entities){
 
     }
     findAll(options){

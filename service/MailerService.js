@@ -1,21 +1,21 @@
 "use strict";
-require('dotenv').config()
 
+const env = require('../commons/get-env');
 const nodemailer = require("nodemailer");
 
 
 module.exports = class MailerService{
     static option = {
-        service : process.env.MAILER_SERVICE,
+        service : env('MAILER_SERVICE'),
         auth : {
-            user : process.env.MAIL_USER,
-            pass : process.env.MAIL_PASS
+            user : env('MAIL_USER'),
+            pass : env('MAIL_PASS')
         }
     };
 
     static async sendMail(mail){        
         try {
-            mail.from = process.env.SEND_FROM;
+            mail.from = env('SEND_FROM');
             const transporter = nodemailer.createTransport(MailerService.option);
             let info = await transporter.sendMail(mail);
             return {
