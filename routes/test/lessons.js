@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const Lesson = require('../../model/test/lesson');
+const MailerService = require('../../service/MailerService');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -35,6 +36,10 @@ router.delete('/quote', async function(req,res){
 
 router.get('/name', function(req, res) {
   res.json(new Lesson().getName());
+});
+
+router.post('/sendmail', async function(req,res){
+  res.json(await MailerService.sendMail(req.body));
 });
 
 module.exports = router;
