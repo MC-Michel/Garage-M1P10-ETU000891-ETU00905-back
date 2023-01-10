@@ -1,7 +1,8 @@
 
 class GenRepository {
+    entityClass;
     constructor(entityClass){
-
+        this.entityClass = entityClass;
     } 
     insert(entities){
 
