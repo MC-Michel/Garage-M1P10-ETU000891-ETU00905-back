@@ -8,14 +8,11 @@ function getConnection(){
     const dbName =  env('MONGO_DBNAME');
     if(!client){
         const url = env('MONGO_URL');
-       
         const options =  { useNewUrlParser: true, useUnifiedTopology: true };
         client = new MongoClient(url, options);
+        
     }   
-
-    client = client.db(dbName)
-    
-    return client;
+    return client.db(dbName);
 }
 const transactionOptions = {
     readConcern: { level: 'snapshot' },

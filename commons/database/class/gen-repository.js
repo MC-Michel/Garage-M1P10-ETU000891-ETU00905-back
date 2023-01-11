@@ -5,19 +5,21 @@ class GenRepository {
     constructor(entityClass){
         this.entityClass = entityClass;
     } 
-    insert(entities){
-
+    async insert(entities){
+        const collection = getConnection().collection(this.entityClass.collection);
+        return await collection.insertMany(entities);
     }
     /**
      * 
      * @param {{columnNames?: string, options?: any}} options 
-     * @returns 
+     * @returns any[]
      */
-    async findAll(options){
+    async find(options){
         const colNames = options.columnNames ? options.columnNames : Object.getOwnPropertyNames(new this.entityClass)
-        const collection = await getConnection().collection(this.entityClass.collection);
+        const collection =  getConnection().collection(this.entityClass.collection);
         return {
-            data: await collection.find(options.options?options.options:{}).toArray()
+            data: (await collection.find(options.options?options.options:{}).toArray())
+                .map(elmt => Object.assign(new this.entityClass, elmt))
         };
     }
     findOne(options){
