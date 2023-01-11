@@ -1,0 +1,106 @@
+const { getConnection } = require("../../../configs/db"); 
+
+class GenRepository {
+    entityClass;
+    constructor(entityClass){
+        this.entityClass = entityClass;
+    } 
+    /**
+     * 
+     * @param {any[]} entities 
+     * @returns any
+     */
+    async insert(entities){
+        const collection = getConnection().collection(this.entityClass.collection);
+        return await collection.insertMany(entities);
+    }
+
+    /**
+     * 
+     * @param {{
+     *  excludeFields?: string[], 
+     *  options?: {
+     *          pagination?: {
+     *              page: string, 
+    *               pageElmtCount: string,
+    *               orderBy: {column: string, order: 'asc'|'desc'}[]
+     *          },
+     *          filters: {
+     *              column: string,
+     *              comparator: string,
+     *              value: string,
+     *              type: "string", "date", "number"
+     *          }[]
+     *      }
+     * }} options 
+     * @returns any[]
+     * 
+     * pagination[page] is a string because of queryParams
+     */
+    async find(options){
+        let colNames = Object.getOwnPropertyNames(new this.entityClass);
+        let aggregate = [];
+        
+        let createPaginationOptions = this.createPaginationOptions(options.pagination);
+        aggregate = aggregate.concat(createPaginationOptions);
+
+        if(options.excludeFields){
+            colNames = colNames.filter(elmt => !options.excludeFields.includes(elmt));
+        }
+        console.log(aggregate)
+        const collection =  getConnection().collection(this.entityClass.collection);
+        return {
+            data: (await collection.aggregate(aggregate).toArray())
+                .map(elmt => Object.assign(new this.entityClass, elmt))
+        };
+    } 
+
+
+    createPaginationOptions(pagination){ 
+        const orders = {
+            "asc": 1,
+            "desc": -1
+        }
+        if(pagination == null) return {};
+        if( pagination.orderBy == null) 
+            pagination.orderBy = [{column: '_id', order: 'asc'}]
+        else 
+            pagination.orderBy.push({column: '_id', order: 'asc'});
+        const sort = {};
+        pagination.orderBy.map(elmt => sort[elmt.column] = orders[elmt.order]);
+        const ans = [
+            {'$limit': +pagination.pageElmtCount},
+            {'$skip': pagination.pageElmtCount * (pagination.page-1)},
+            {'$sort': sort}
+         ] ;
+        return ans;
+    }
+
+    createMatchOptions(filters){
+        const comparators = {
+            "=": "$eq",
+            "<": "$lt",
+            ">": "$gt",
+            "<=": "$lte",
+            ">=": "$gte",
+        };
+        
+       const ans = filters.map(filter => {
+            const value=this.parseValue(filter.value, filter.type);
+            if(filter.comparator === "like"){
+                return {[filter.column]:{'$regex': value, '$options': 'i' }};
+            }
+            return {[filter.column]: { [comparators[filter.comparator]]: value}};
+        })
+        return { '$and': ans };
+    }
+    parseValue(value, type){
+        if(type === "number")
+            return +value;
+        if(type === "date")
+            return new Date(value);
+        return value;
+    }
+}
+
+module.exports = GenRepository;
