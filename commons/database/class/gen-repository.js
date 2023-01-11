@@ -49,8 +49,7 @@ class GenRepository {
     } 
 
 
-    createPaginationOptions(pagination){
-        console.log(pagination)
+    createPaginationOptions(pagination){ 
         if(pagination == null) return {};
         if( pagination.orderBy == null) pagination.orderBy = [{column: '_id', order: 'asc'}];
         const ans = {
