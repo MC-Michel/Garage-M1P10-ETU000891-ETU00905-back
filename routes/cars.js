@@ -13,7 +13,7 @@ const getList = async function(req, res) {
 };
 
 const insertCar = async function(req, res) {
-  const data = await carRepository.insert([req.body]);
+  await carRepository.insert([req.body]);
   res.json("Car created");
 }
 

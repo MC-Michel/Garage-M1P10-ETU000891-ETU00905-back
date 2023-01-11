@@ -5,6 +5,11 @@ class GenRepository {
     constructor(entityClass){
         this.entityClass = entityClass;
     } 
+    /**
+     * 
+     * @param {any[]} entities 
+     * @returns any
+     */
     async insert(entities){
         const collection = getConnection().collection(this.entityClass.collection);
         return await collection.insertMany(entities);
