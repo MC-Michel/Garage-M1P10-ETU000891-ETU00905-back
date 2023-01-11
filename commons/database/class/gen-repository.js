@@ -14,21 +14,52 @@ class GenRepository {
         const collection = getConnection().collection(this.entityClass.collection);
         return await collection.insertMany(entities);
     }
+
     /**
      * 
-     * @param {{columnNames?: string, options?: any}} options 
+     * @param {{
+     *  excludeFields?: string[], 
+     *  options?: {
+     *          pagination?: {
+     *              page: string, 
+    *               pageElmtCount: string,
+    *               orderBy: {column: string, order: 'asc'|'desc'}[]
+     *          }
+     *      }
+     * }} options 
      * @returns any[]
+     * 
+     * pagination[page] is a string because of queryParams
      */
     async find(options){
-        const colNames = options.columnNames ? options.columnNames : Object.getOwnPropertyNames(new this.entityClass)
+        let colNames = Object.getOwnPropertyNames(new this.entityClass);
+        let queryOptions = {};
+        
+        let createPaginationOptions = this.createPaginationOptions(options.pagination);
+        queryOptions = {...queryOptions, ...createPaginationOptions};
+
+        if(options.excludeFields){
+            colNames = colNames.filter(elmt => !options.excludeFields.includes(elmt));
+        }
         const collection =  getConnection().collection(this.entityClass.collection);
         return {
-            data: (await collection.find(options.options?options.options:{}).toArray())
+            data: (await collection.find({},queryOptions).toArray())
                 .map(elmt => Object.assign(new this.entityClass, elmt))
         };
-    }
-    findOne(options){
+    } 
 
+
+    createPaginationOptions(pagination){
+        console.log(pagination)
+        if(pagination == null) return {};
+        if( pagination.orderBy == null) pagination.orderBy = [{column: '_id', order: 'asc'}];
+        const ans = {
+            limit: +pagination.pageElmtCount,
+            skip: pagination.pageElmtCount * (pagination.page-1),
+            sort: pagination.orderBy.map(elmt => [elmt.column, elmt.order])
+        } ;
+        console.log(ans);
+        return ans;
     }
 }
 

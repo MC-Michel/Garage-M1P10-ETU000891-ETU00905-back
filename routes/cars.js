@@ -7,8 +7,8 @@ var router = express.Router();
 
 const carRepository = new GenRepository(Car);
 
-const getList = async function(req, res) { 
-  const data = await carRepository.find({});
+const getList = async function(req, res) {  
+  const data = await carRepository.find(req.query);
   res.json(data);
 };
 
