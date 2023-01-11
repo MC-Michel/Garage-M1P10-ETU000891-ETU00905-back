@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const Lesson = require('../../models/test/lesson');
-const MailerService = require('../../service/MailerService');
+const MailerService = require('../../services/mailer.service');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {

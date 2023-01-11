@@ -1,6 +1,6 @@
 "use strict";
 
-const env = require('../commons/get-env');
+const env = require('../commons/functions/get-env');
 const nodemailer = require("nodemailer");
 
 

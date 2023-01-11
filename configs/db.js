@@ -1,19 +1,20 @@
 "use strict";
 
 const { MongoClient } = require("mongodb");
-const env= require('../commons/get-env')
+const env= require('../commons/functions/get-env')
 
 var client;
-async function getConnection(){
+function getConnection(){
+    const dbName =  env('MONGO_DBNAME');
     if(!client){
         const url = env('MONGO_URL');
-        const dbName =  env('MONGO_DBNAME');
+       
         const options =  { useNewUrlParser: true, useUnifiedTopology: true };
         client = new MongoClient(url, options);
-        client.dbName = dbName;
-        
-    }
-    client = await client.connect()
+    }   
+
+    client = client.db(dbName)
+    
     return client;
 }
 const transactionOptions = {
