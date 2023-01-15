@@ -31,9 +31,7 @@ module.exports = class UserService {
         if(users.data.length  === 0) throw new CustomError ("Email ou mot de passe invalide");
         return users.data[0];
     }
-    static async logoutToken(token){
-
-    }
+   
     static async createToken(user){
         const creationDate = new Date()
         const token = {
