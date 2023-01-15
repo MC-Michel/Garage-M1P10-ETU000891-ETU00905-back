@@ -6,6 +6,9 @@ class GenRepository {
     constructor(entityClass){
         this.entityClass = entityClass;
     } 
+    getCollection(){
+        return getConnection().collection(this.entityClass.collection)
+    }
     /**
      * 
      * @param {any[]} entities 
@@ -20,36 +23,50 @@ class GenRepository {
     /**
      * 
      * @param {{
+     * 
      *  excludeFields?: string[],
      *  pagination?: {
      *              page: string, 
     *               pageElmtCount: string,
     *               orderBy: {column: string, order: 'asc'|'desc'}[]
-     *          }
+     *          },
+     *  filters?:[
+     *      {
+     *          column: string, 
+     *          value: string,
+     *          type: string,
+     *          comparator: string
+     *      }
+     *  ],
+     * filterMode: 'and' | 'or'
      * }} options 
      * @returns any[]
      * 
      * pagination[page] is a string because of queryParams
      */
     async find(params){
-        let colNames = Object.keys(this.entityClass.schema);
+        let projection ={};
         if(params.excludeFields){
-            colNames = colNames.filter(elmt => !params.excludeFields.includes(elmt));
+            params.excludeFields.forEach(element => {
+                projection[element]=0;
+           });
         }
         let queryOptions = {};
         
         let createPaginationOptions = this.createPaginationOptions(params.pagination);
         queryOptions = {...queryOptions, ...createPaginationOptions};
-        console.log(params)
       
-        const collection =  getConnection().collection(this.entityClass.collection);
-        const results = await collection.find({},queryOptions).toArray();
+      
+        const filters = this.createMatchOptions(params.filter, params.filterMode)
+      
+        const collection = this.getCollection();
+        const results = await collection.find(filters,queryOptions).project(projection).toArray();
          
         return {
             data: results
                 .map(elmt => Object.assign(new this.entityClass, elmt)),
             meta: {
-                totalElmtCount: (await collection.countDocuments())
+                totalElmtCount: (await collection.countDocuments(filters))
             }
         };
     } 
@@ -78,6 +95,34 @@ class GenRepository {
     async delete(id){
         const collection = getConnection().collection(this.entityClass.collection);
         return await collection.deleteOne({_id: id});
+    }
+
+    createMatchOptions(filters, filterMode){
+        if(!filters || filters.length === 0) return {}
+        const comparators = {
+            "=": "$eq",
+            "<": "$lt",
+            ">": "$gt",
+            "<=": "$lte",
+            ">=": "$gte",
+        };
+        
+       const ans = filters.map(filter => {
+            const value=this.parseValue(filter.value, filter.type);
+            if(filter.comparator === "like"){
+                return {[filter.column]:{'$regex': value, '$options': 'i' }};
+            }
+            const f = {[filter.column]: { [comparators[filter.comparator]]: value}};
+            return f;
+        })
+        return { [filterMode ==='or'?'$or': '$and']: ans };
+    }
+    parseValue(value, type){
+        if(type === "int" && type === "float" && type === "number")
+            return +value;
+        if(type === "date")
+            return new Date(value);
+        return value;
     }
 }
 

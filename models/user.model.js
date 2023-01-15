@@ -16,13 +16,13 @@ class User {
         },
         "password":  {
             type: 'string', 
-            validatorGetter: (paramPropertyName='lastName')=> 
+            validatorGetter: (paramPropertyName='password')=> 
                 body(paramPropertyName).isString().withMessage("Mot de passe invalide")
         },
         "email": {
             type: 'string', 
-            validatorGetter: (paramPropertyName='lastName')=> 
-                body(paramPropertyName).isString().withMessage("Email invalide")
+            validatorGetter: (paramPropertyName='email')=> 
+                body(paramPropertyName).isEmail().withMessage("Email invalide")
         },
         "role": {
             type: 'int'
@@ -43,5 +43,17 @@ class User {
         return ans;
     } )()
     static updateSchemaDto = {...this.schema}
+    static loginSchemaDto = {
+        "email": {
+            type: 'string', 
+            validatorGetter: (paramPropertyName='email')=> 
+                body(paramPropertyName).isEmail().withMessage("Email invalide")
+        },
+        "password":  {
+            type: 'string', 
+            validatorGetter: (paramPropertyName='password')=> 
+                body(paramPropertyName).isString().withMessage("Mot de passe invalide")
+        },
+    }
 }
 module.exports = User;
