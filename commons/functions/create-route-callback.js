@@ -8,7 +8,7 @@ function createRouteCallback(f){
             const errors = validationResult(req);
             if(errors){
                 if (!errors.isEmpty()) {
-                    return res.status(400).json({ errors: errors.array() });
+                    return res.status(400).json({ message: errors.array().map(elmt => elmt.msg).join('\n') });
                 }
             }
            
