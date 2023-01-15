@@ -1,8 +1,10 @@
-var express = require('express');
+var express = require('express'); 
 const GenRepository = require('../commons/database/class/gen-repository');
 const createRouteCallback = require('../commons/functions/create-route-callback');
 const { getConnection } = require('../configs/db');
+const createBodySchemaParser = require('../middlewares/body-schema-parser');
 const Car = require('../models/car.model');
+const {assign} = require('../commons/database/methods/gen-reflect')
 var router = express.Router();
 
 const carRepository = new GenRepository(Car);
@@ -24,10 +26,17 @@ const deleteCar = async function (req, res) {
   await carRepository.delete(req.params.id);
   res.json({message: "Car deleted"});
 }
-
+const testBodyParser = async function (req, res){
+  
+  console.log(req.body);
+  console.log(assign(Car, req.body));
+  res.json({message: "Done"});
+}
 router.get('', createRouteCallback(getList));
 router.post('', createRouteCallback(insertCar));
 router.delete('/:id', createRouteCallback(deleteCar));
-router.patch('', createRouteCallback(updateCar))
+router.patch('', createRouteCallback(updateCar));
+
+router.post('/test-body-parser',createBodySchemaParser(Car.schema), createRouteCallback(testBodyParser));
 
 module.exports = router;

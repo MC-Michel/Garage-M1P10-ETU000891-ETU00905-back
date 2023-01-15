@@ -18,40 +18,44 @@ class GenRepository {
     /**
      * 
      * @param {{
-     *  excludeFields?: string[], 
-     *  options?: {
-     *          pagination?: {
+     *  excludeFields?: string[],
+     *  pagination?: {
      *              page: string, 
     *               pageElmtCount: string,
     *               orderBy: {column: string, order: 'asc'|'desc'}[]
      *          }
-     *      }
      * }} options 
      * @returns any[]
      * 
      * pagination[page] is a string because of queryParams
      */
-    async find(options){
-        let colNames = Object.getOwnPropertyNames(new this.entityClass);
+    async find(params){
+        let colNames = Object.keys(this.entityClass.schema);
         let queryOptions = {};
         
-        let createPaginationOptions = this.createPaginationOptions(options.pagination);
+        let createPaginationOptions = this.createPaginationOptions(params.pagination);
         queryOptions = {...queryOptions, ...createPaginationOptions};
-
-        if(options.excludeFields){
-            colNames = colNames.filter(elmt => !options.excludeFields.includes(elmt));
+        console.log(params)
+        if(params.excludeFields){
+            colNames = colNames.filter(elmt => !params.excludeFields.includes(elmt));
         }
         const collection =  getConnection().collection(this.entityClass.collection);
+        const results = await collection.find({},queryOptions).toArray();
+         
         return {
-            data: (await collection.find({},queryOptions).toArray())
-                .map(elmt => Object.assign(new this.entityClass, elmt))
+            data: results
+                .map(elmt => Object.assign(new this.entityClass, elmt)),
+            meta: {
+                totalElmtCount: (await collection.countDocuments())
+            }
         };
     } 
 
 
     createPaginationOptions(pagination){ 
         if(pagination == null) return {};
-        if( pagination.orderBy == null) pagination.orderBy = [{column: '_id', order: 'asc'}];
+        if( pagination.orderBy == null) pagination.orderBy = [];
+        pagination.orderBy.push({column: '_id', order: 'asc'});
         const ans = {
             limit: +pagination.pageElmtCount,
             skip: pagination.pageElmtCount * (pagination.page-1),
