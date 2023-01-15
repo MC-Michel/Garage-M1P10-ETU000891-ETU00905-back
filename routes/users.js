@@ -5,7 +5,7 @@ const { assign } = require('../commons/database/methods/gen-reflect');
 const createRouteCallback = require('../commons/functions/create-route-callback');
 const CustomError = require('../errors/custom-error');
 const createBodySchemaParser = require('../middlewares/body-schema-parser');
-const User = require('../models/user.model');
+const User = require('../models/user.model'); 
 const UserService = require('../services/user.service');
 var router = express.Router();
 
@@ -23,7 +23,8 @@ const signin = async function (req, res){
 
 const login = async function (req, res){
     const user = await UserService.findUserByEmailAndPassword(req.body);
-    res.json({data: user})
+    const token = await UserService.createToken(user)
+    res.json({user, token})
 }
 router.post('/signin', createBodySchemaParser(User),createRouteCallback(signin));
 router.post('/login', createBodySchemaParser(User, 'loginSchemaDto'), createRouteCallback(login));
