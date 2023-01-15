@@ -1,13 +1,17 @@
-function getPropertyNames(instance){
-    return Object.keys(instance.schema);
-}
+
 
 function assign(targetClass, obj){
+
     const newIntance = new targetClass;
-    getPropertyNames(targetClass).map((key)=>{
-        newIntance[key] = obj[key]
+    Object.keys(targetClass.schema).map(key=>{
+        if(targetClass.schema.classConstructor){
+            newIntance[key] = assign(targetClass.schema.classConstructor,obj[key] )
+        }else 
+            newIntance[key] = obj[key]
     })
+    
     return newIntance;
+
 }
 
 module.exports.assign = assign;

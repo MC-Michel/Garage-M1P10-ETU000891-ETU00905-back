@@ -1,4 +1,5 @@
-const {body} = require('express-validator')
+const {body} = require('express-validator');
+const Car = require('../models/car.model');
 /**
  * 
  * @param {{
@@ -11,10 +12,15 @@ const {body} = require('express-validator')
  * } schema 
  * @returns 
  */
-function createBodySchemaParser(schema){
-    const ans = []
+
+function createBodySchemaParser(schema, prefix=''){
+    let ans = []
     for(let key of Object.keys(schema)){
-       ans.push(schema[key].validator);
+        const currentKey = prefix === ''? key: `${prefix}[${key}]`
+        if(schema.classConstructor)
+            ans = ans.append(createBodySchemaParser(schema.classConstructor.schema, currentKey));
+        else
+            ans.push(schema[key].validatorGetter(currentKey));
     }
     return ans;
 }
