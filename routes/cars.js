@@ -37,6 +37,6 @@ router.post('', createRouteCallback(insertCar));
 router.delete('/:id', createRouteCallback(deleteCar));
 router.patch('', createRouteCallback(updateCar));
 
-router.post('/test-body-parser',createBodySchemaParser(Car.schema), createRouteCallback(testBodyParser));
+router.post('/test-body-parser',createBodySchemaParser(Car), createRouteCallback(testBodyParser));
 
 module.exports = router;

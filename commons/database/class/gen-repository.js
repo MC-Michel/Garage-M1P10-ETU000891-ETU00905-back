@@ -1,4 +1,5 @@
 const { getConnection } = require("../../../configs/db"); 
+const { assign } = require("../methods/gen-reflect");
 
 class GenRepository {
     entityClass;
@@ -11,8 +12,9 @@ class GenRepository {
      * @returns any
      */
     async insert(entities){
+        const toInsert  = entities.map(elmt=> assign(this.entityClass, elmt));
         const collection = getConnection().collection(this.entityClass.collection);
-        return await collection.insertMany(entities);
+        return await collection.insertMany(toInsert);
     }
 
     /**
@@ -31,14 +33,15 @@ class GenRepository {
      */
     async find(params){
         let colNames = Object.keys(this.entityClass.schema);
+        if(params.excludeFields){
+            colNames = colNames.filter(elmt => !params.excludeFields.includes(elmt));
+        }
         let queryOptions = {};
         
         let createPaginationOptions = this.createPaginationOptions(params.pagination);
         queryOptions = {...queryOptions, ...createPaginationOptions};
         console.log(params)
-        if(params.excludeFields){
-            colNames = colNames.filter(elmt => !params.excludeFields.includes(elmt));
-        }
+      
         const collection =  getConnection().collection(this.entityClass.collection);
         const results = await collection.find({},queryOptions).toArray();
          

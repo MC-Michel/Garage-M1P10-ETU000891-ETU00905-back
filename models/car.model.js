@@ -6,6 +6,8 @@ class Car {
         "weight": { type: 'int',  validatorGetter: (paramPropertyName='weight')=> body(paramPropertyName).isInt().withMessage("Poids invalide").toInt() },
         "registrationDate": { type: 'date', validatorGetter: (paramPropertyName='registrationDate')=> body(paramPropertyName).isISO8601().withMessage("Date d'enregistrement invalide").toDate() }
     }
+    static createSchemaDto = {...this.schema};
+    static updateSchemaDto = {...this.schema};
     static collection = "Car";
 }
 
