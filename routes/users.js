@@ -1,16 +1,16 @@
 var express = require('express'); 
-const { token } = require('morgan');
 const GenRepository = require('../commons/database/class/gen-repository');
 const { assign } = require('../commons/database/methods/gen-reflect');
 const createRouteCallback = require('../commons/functions/create-route-callback');
 const CustomError = require('../errors/custom-error');
 const createBodySchemaParser = require('../middlewares/body-schema-parser');
 const User = require('../models/user.model'); 
+const TokenRepository = require('../repositories/token.repo');
 const UserService = require('../services/user.service');
 var router = express.Router();
 
 const userRepository = new GenRepository(User);
-
+const tokenRepository = new TokenRepository();
 
 const signin = async function (req, res){
     const newUser = assign(User, req.body);
@@ -29,13 +29,13 @@ const login = async function (req, res){
 }
 
 const logout = async function (req, res){
-    throw new CustomError('Not implemented');
-    //res.json({message: "User deconnecte avec succes"});
+    await tokenRepository.destroyToken(req.headers.token);
+    res.json({message: "User deconnecte avec succes"});
 }
 
 const canAccess = async function (req, res) {
-    throw new CustomError('Not implemented');
-    //res.json({canAccess: true});
+    const canAccess = req.roleId == req.currentUser.roleId;
+    res.json({canAccess});
 }
 
 router.post('/signin', createBodySchemaParser(User),createRouteCallback(signin));
