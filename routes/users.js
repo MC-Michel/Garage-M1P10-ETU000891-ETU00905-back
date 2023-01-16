@@ -7,6 +7,7 @@ const createBodySchemaParser = require('../middlewares/body-schema-parser');
 const User = require('../models/user.model'); 
 const TokenRepository = require('../repositories/token.repo');
 const UserService = require('../services/user.service');
+const createAuth = require('../middlewares/auth');
 var router = express.Router();
 
 const userRepository = new GenRepository(User);
@@ -16,7 +17,7 @@ const signin = async function (req, res){
     const newUser = assign(User, req.body);
     if(req.body.confirmPassword !== newUser.password)
         throw new CustomError('Les 2 mots de passes sont differentes')
-    newUser.role = 1;
+    newUser.roleId = 1;
     await userRepository.insert([newUser]);
     res.json({message: "Client enregistré"});
 }
@@ -38,9 +39,17 @@ const canAccess = async function (req, res) {
     res.json({canAccess});
 }
 
+const createTest  = (n) => function (req, res){
+    res.json({message:"Called test "+n})
+}
+
 router.post('/signin', createBodySchemaParser(User),createRouteCallback(signin));
 router.post('/login', createBodySchemaParser(User, 'loginSchemaDto'), createRouteCallback(login));
 router.get('/logout', createRouteCallback(logout));
 router.post('/can-access', createBodySchemaParser(User, 'canAccessDto'), createRouteCallback(canAccess));
+
+router.get('/test-1', createAuth(), createTest(1))
+router.get('/test-2', createAuth([1]), createTest(2))
+router.get('/test-3', createAuth([2]), createTest(3))
 
 module.exports = router;

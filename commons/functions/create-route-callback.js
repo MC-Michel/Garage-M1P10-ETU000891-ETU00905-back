@@ -17,7 +17,7 @@ function createRouteCallback(f){
             let message= "Une erreur s'est produite...";
             console.log(e.message);
             if(e instanceof CustomError) message = e.message;
-            res.status(e.code?e.code:500 ).json({message: message})
+            res.status(e.statusCode?e.statusCode:500 ).json({message: message})
         }        
     };
 }

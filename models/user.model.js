@@ -24,7 +24,7 @@ class User {
             validatorGetter: (paramPropertyName='email')=> 
                 body(paramPropertyName).isEmail().withMessage("Email invalide")
         },
-        "role": {
+        "roleId": {
             type: 'int'
         },
         "customerData": {
