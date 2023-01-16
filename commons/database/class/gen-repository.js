@@ -1,3 +1,4 @@
+const { ObjectID } = require("bson");
 const { getConnection } = require("../../../configs/db"); 
 const { assign } = require("../methods/gen-reflect");
 
@@ -89,12 +90,12 @@ class GenRepository {
         const collection = getConnection().collection(this.entityClass.collection);
         const id = entity._id;
         delete entity._id;
-        return await collection.updateOne({_id: id}, {$set: entity});
+        return await collection.updateOne({_id: ObjectID(id)}, {$set: entity});
     }
 
     async delete(id){
         const collection = getConnection().collection(this.entityClass.collection);
-        return await collection.deleteOne({_id: id});
+        return await collection.deleteOne({_id: ObjectID(id)});
     }
 
     createMatchOptions(filters, filterMode){
