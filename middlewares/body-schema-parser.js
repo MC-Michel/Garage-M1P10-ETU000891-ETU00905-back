@@ -17,10 +17,12 @@ function createBodySchemaParser(entityClass,schemaName='createSchemaDto', prefix
     let ans = []
     const schema = entityClass[schemaName];
     for(let key of Object.keys(schema)){
+        
         const currentKey = prefix === ''? key: `${prefix}.${key}`
         if(schema[key].classConstructor){
             ans.push(...createBodySchemaParser(schema[key].classConstructor, schemaName, currentKey));
         }
+        if(!schema[key].validatorGetter) continue;
         else{
             ans.push(schema[key].validatorGetter(currentKey));
         }

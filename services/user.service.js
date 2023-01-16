@@ -28,7 +28,7 @@ module.exports = class UserService {
                 },
             ]
         }) 
-        if(users.data.length  === 0) throw new CustomError ("Email ou mot de passe invalide");
+        if(users.data.length  === 0) return null;
         return users.data[0];
     }
    

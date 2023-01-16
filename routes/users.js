@@ -23,10 +23,24 @@ const signin = async function (req, res){
 
 const login = async function (req, res){
     const user = await UserService.findUserByEmailAndPassword(req.body);
+    if(!user) throw new CustomError('Email ou mot de passe invalide')
     const token = await UserService.createToken(user)
     res.json({user, token})
 }
+
+const logout = async function (req, res){
+    throw new CustomError('Not implemented');
+    //res.json({message: "User deconnecte avec succes"});
+}
+
+const canAccess = async function (req, res) {
+    throw new CustomError('Not implemented');
+    //res.json({canAccess: true});
+}
+
 router.post('/signin', createBodySchemaParser(User),createRouteCallback(signin));
 router.post('/login', createBodySchemaParser(User, 'loginSchemaDto'), createRouteCallback(login));
+router.get('/logout', createRouteCallback(logout));
+router.post('/can-access', createBodySchemaParser(User, 'canAccessDto'), createRouteCallback(canAccess));
 
 module.exports = router;

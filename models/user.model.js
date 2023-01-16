@@ -55,5 +55,12 @@ class User {
                 body(paramPropertyName).isString().withMessage("Mot de passe invalide")
         },
     }
+    static canAccessDto = {
+        "roleId":  {
+            type: 'string', 
+            validatorGetter: (paramPropertyName='roleId')=> 
+                body(paramPropertyName).isString().withMessage("roleId invalide")
+        },
+    }
 }
 module.exports = User;
