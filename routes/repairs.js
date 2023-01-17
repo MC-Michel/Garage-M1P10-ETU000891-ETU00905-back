@@ -37,6 +37,10 @@ router.post('', createRouteCallback(insertRepair));
 router.delete('/:id', createRouteCallback(deleteRepair));
 router.patch('', createRouteCallback(updateRepair));
 
+// Financier
+router.get('/valid', createRouteCallback(getList));
+router.patch('/valid', createRouteCallback(updateRepair));
+
 router.post('/test-body-parser',createBodySchemaParser(Repair), createRouteCallback(testBodyParser));
 
 module.exports = router;
