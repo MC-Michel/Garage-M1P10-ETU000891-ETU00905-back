@@ -40,15 +40,21 @@ const canAccess = async function (req, res) {
     res.json({canAccess});
 }
 
-const createTest  = (n) => function (req, res){
-    res.json({message:"Called test "+n})
+
+const getUserData = async function (req, res){
+    const user = req.currentUser;
+    res.json(user);
 }
 
 router.post('/signin', createBodySchemaParser(User),createRouteCallback(signin));
 router.post('/login', createBodySchemaParser(User, 'loginSchemaDto'), createRouteCallback(login));
 router.get('/logout',createAuth(), createRouteCallback(logout));
 router.post('/can-access',createAuth(), createBodySchemaParser(User, 'canAccessDto'), createRouteCallback(canAccess));
+router.get('/user-data',createAuth(), createRouteCallback(getUserData));
 
+const createTest  = (n) => function (req, res){
+    res.json({message:"Called test "+n})
+}
 router.get('/test-1', createAuth(), createTest(1))
 router.get('/test-2', createAuth([1]), createTest(2))
 router.get('/test-3', createAuth([2]), createTest(3))
