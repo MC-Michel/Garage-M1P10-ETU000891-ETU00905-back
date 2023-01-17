@@ -34,8 +34,9 @@ const logout = async function (req, res){
     res.json({message: "User deconnecte avec succes"});
 }
 
-const canAccess = async function (req, res) {
-    const canAccess = req.roleId == req.currentUser.roleId;
+const canAccess = async function (req, res) { 
+    let canAccess = req.body.roleIds.includes(req.currentUser.roleId);
+    if(req.body.roleIds.length === 0) canAccess = true;
     res.json({canAccess});
 }
 
@@ -45,8 +46,8 @@ const createTest  = (n) => function (req, res){
 
 router.post('/signin', createBodySchemaParser(User),createRouteCallback(signin));
 router.post('/login', createBodySchemaParser(User, 'loginSchemaDto'), createRouteCallback(login));
-router.get('/logout', createRouteCallback(logout));
-router.post('/can-access', createBodySchemaParser(User, 'canAccessDto'), createRouteCallback(canAccess));
+router.get('/logout',createAuth(), createRouteCallback(logout));
+router.post('/can-access',createAuth(), createBodySchemaParser(User, 'canAccessDto'), createRouteCallback(canAccess));
 
 router.get('/test-1', createAuth(), createTest(1))
 router.get('/test-2', createAuth([1]), createTest(2))

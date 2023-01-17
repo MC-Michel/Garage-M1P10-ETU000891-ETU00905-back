@@ -56,10 +56,10 @@ class User {
         },
     }
     static canAccessDto = {
-        "roleId":  {
-            type: 'string', 
+        "roleIds":  {
+            type: 'array', 
             validatorGetter: (paramPropertyName='roleId')=> 
-                body(paramPropertyName).isString().withMessage("roleId invalide")
+                body(paramPropertyName).isArray().withMessage("roleId invalide")
         },
     }
 }

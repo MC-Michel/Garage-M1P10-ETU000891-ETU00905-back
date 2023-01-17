@@ -21,7 +21,7 @@ module.exports = class TokenRepository extends GenRepository{
             }
         ]).toArray();
         if(results.length === 0) throw new CustomError("Token invalide");
-        return results[0].user;
+        return results[0].user[0];
     }
     async destroyToken(token){
         const currentCollection = this.getCollection();
