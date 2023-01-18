@@ -30,6 +30,10 @@ const depositCar = async function(req, res) {
   await carRepository.update(req.body);
   res.json({message: "Car deposited"});
 }
+const addCurrentRepair = async function(req, res) {
+  await carRepository.update(req.body);
+  res.json({message: "Car updated"});
+}
 const testBodyParser = async function (req, res){
   
   console.log(req.body);
@@ -41,6 +45,7 @@ router.post('', createRouteCallback(insertCar));
 router.delete('/:id', createRouteCallback(deleteCar));
 router.patch('', createRouteCallback(updateCar));
 router.patch('/deposit', createRouteCallback(depositCar));
+router.patch('/add_current_repair', createRouteCallback(addCurrentRepair));
 
 router.post('/test-body-parser',createBodySchemaParser(Car), createRouteCallback(testBodyParser));
 
