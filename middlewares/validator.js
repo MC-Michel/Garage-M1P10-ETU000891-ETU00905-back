@@ -133,22 +133,7 @@ class Validator extends Callable{
 
 
     //Sanitization methods
-    toString(){
-        const method = (req) =>{
-            const value= this.getValueBySelector(req)
-            if(Array.isArray(value)){
-                for(let str of value){
-                    if(typeof(str) !== 'string')
-                        return false;
-                }
-                return true
-            }
-            if(typeof(str) === 'string')
-                return true;
-            return false;
-        }
-        this.addMethod(method);
-    }
+    //Here
 }
 
 module.exports.body = (key) => new Validator('body', key);
