@@ -36,7 +36,10 @@ const addCurrentRepair = async function(req, res) {
   res.json({message: "Car updated"});
 }
 const getCurrentRepairToValid = async function(req, res) {  
-  req.query.filter = [{column: 'currentRepair' , value:true, comparator: 'exists'}];
+  req.query.filter = [
+    {column: 'currentRepair' , value:true, comparator: 'exists'},
+    {column: 'currentRepair.status' , value:0, comparator: '='},
+  ];
   const data = await carRepository.find(req.query);
   res.json(data);
 };
@@ -45,7 +48,17 @@ const validPaiement = async function(req, res) {
   res.json({message: "Car updated"});
 }
 const getCurrentRepairByCarAtelier = async function(req, res) {  
-  req.query.filter = [{column: '_id' , value:ObjectID(req.query.id), comparator: '='}];
+  req.query.filter = [
+    {column: '_id' , value:ObjectID(req.query.id), comparator: '='}
+  ];
+  const data = await carRepository.find(req.query);
+  res.json(data);
+};
+const getRepairsAtelier = async function(req, res) {  
+  req.query.filter = [
+    {column: 'currentRepair' , value:true, comparator: 'exists'},
+    {column: 'currentRepair.status' , value:1, comparator: '='},
+  ];
   const data = await carRepository.find(req.query);
   res.json(data);
 };
@@ -65,6 +78,7 @@ router.patch('/add_current_repair', createRouteCallback(addCurrentRepair));
 router.get('/current_repair_to_valid', createRouteCallback(getCurrentRepairToValid));
 router.patch('/valid_paiement', createRouteCallback(validPaiement));
 router.get('/atelier/current_repair', createRouteCallback(getCurrentRepairByCarAtelier));
+router.get('/atelier/repair', createRouteCallback(getRepairsAtelier));
 
 router.post('/test-body-parser',createBodySchemaParser(Car), createRouteCallback(testBodyParser));
 
