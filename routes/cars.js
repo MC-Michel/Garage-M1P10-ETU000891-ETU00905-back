@@ -36,6 +36,7 @@ const addCurrentRepair = async function(req, res) {
   res.json({message: "Car updated"});
 }
 const getCurrentRepairToValid = async function(req, res) {  
+  req.query.filter = [{column: 'currentRepair' , value:true, comparator: 'exists'}];
   const data = await carRepository.find(req.query);
   res.json(data);
 };

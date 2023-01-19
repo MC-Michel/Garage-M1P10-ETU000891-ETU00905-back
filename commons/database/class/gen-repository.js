@@ -106,6 +106,7 @@ class GenRepository {
             ">": "$gt",
             "<=": "$lte",
             ">=": "$gte",
+            "exists" : "$exists"
         };
         
        const ans = filters.map(filter => {
@@ -116,6 +117,7 @@ class GenRepository {
             const f = {[filter.column]: { [comparators[filter.comparator]]: value}};
             return f;
         })
+        console.log(ans);
         return { [filterMode ==='or'?'$or': '$and']: ans };
     }
     parseValue(value, type){
