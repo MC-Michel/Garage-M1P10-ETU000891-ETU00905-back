@@ -23,6 +23,12 @@ const updateCar = async function(req, res) {
   await carRepository.update(req.body);
   res.json({message: "Car updated"});
 }
+const updateCarRepairsProgression = async function(req, res) {
+  console.log("update car");
+  console.log(req.body);
+  await carRepository.update(req.body);
+  res.json({message: "Car updated"});
+}
 const deleteCar = async function (req, res) {
   await carRepository.delete(req.params.id);
   res.json({message: "Car deleted"});
@@ -73,6 +79,7 @@ router.get('', createRouteCallback(getList));
 router.post('', createRouteCallback(insertCar));
 router.delete('/:id', createRouteCallback(deleteCar));
 router.patch('', createRouteCallback(updateCar));
+router.patch('/repairs_progression', createRouteCallback(updateCarRepairsProgression));
 router.patch('/deposit', createRouteCallback(depositCar));
 router.patch('/add_current_repair', createRouteCallback(addCurrentRepair));
 router.get('/current_repair_to_valid', createRouteCallback(getCurrentRepairToValid));
