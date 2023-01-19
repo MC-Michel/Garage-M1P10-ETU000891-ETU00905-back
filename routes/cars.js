@@ -34,6 +34,15 @@ const addCurrentRepair = async function(req, res) {
   await carRepository.update(req.body);
   res.json({message: "Car updated"});
 }
+const getCurrentRepairToValid = async function(req, res) {  
+  const data = await carRepository.find(req.query);
+  res.json(data);
+};
+const validPaiement = async function(req, res) {
+  await carRepository.update(req.body);
+  res.json({message: "Car updated"});
+}
+
 const testBodyParser = async function (req, res){
   
   console.log(req.body);
@@ -46,6 +55,8 @@ router.delete('/:id', createRouteCallback(deleteCar));
 router.patch('', createRouteCallback(updateCar));
 router.patch('/deposit', createRouteCallback(depositCar));
 router.patch('/add_current_repair', createRouteCallback(addCurrentRepair));
+router.get('/current_repair_to_valid', createRouteCallback(getCurrentRepairToValid));
+router.patch('/valid_paiement', createRouteCallback(validPaiement));
 
 router.post('/test-body-parser',createBodySchemaParser(Car), createRouteCallback(testBodyParser));
 
