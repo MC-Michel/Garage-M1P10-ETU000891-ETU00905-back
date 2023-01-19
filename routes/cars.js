@@ -4,7 +4,8 @@ const createRouteCallback = require('../commons/functions/create-route-callback'
 const { getConnection } = require('../configs/db');
 const createBodySchemaParser = require('../middlewares/body-schema-parser');
 const Car = require('../models/car.model');
-const {assign} = require('../commons/database/methods/gen-reflect')
+const {assign} = require('../commons/database/methods/gen-reflect');
+const { ObjectID } = require('bson');
 var router = express.Router();
 
 const carRepository = new GenRepository(Car);
@@ -42,6 +43,11 @@ const validPaiement = async function(req, res) {
   await carRepository.update(req.body);
   res.json({message: "Car updated"});
 }
+const getCurrentRepairByCarAtelier = async function(req, res) {  
+  req.query.filter = [{column: '_id' , value:ObjectID(req.query.id), comparator: '='}];
+  const data = await carRepository.find(req.query);
+  res.json(data);
+};
 
 const testBodyParser = async function (req, res){
   
@@ -57,6 +63,7 @@ router.patch('/deposit', createRouteCallback(depositCar));
 router.patch('/add_current_repair', createRouteCallback(addCurrentRepair));
 router.get('/current_repair_to_valid', createRouteCallback(getCurrentRepairToValid));
 router.patch('/valid_paiement', createRouteCallback(validPaiement));
+router.get('/atelier/current_repair', createRouteCallback(getCurrentRepairByCarAtelier));
 
 router.post('/test-body-parser',createBodySchemaParser(Car), createRouteCallback(testBodyParser));
 
