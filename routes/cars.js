@@ -24,8 +24,6 @@ const updateCar = async function(req, res) {
   res.json({message: "Car updated"});
 }
 const updateCarRepairsProgression = async function(req, res) {
-  console.log("update car");
-  console.log(req.body);
   await carRepository.update(req.body);
   res.json({message: "Car updated"});
 }
