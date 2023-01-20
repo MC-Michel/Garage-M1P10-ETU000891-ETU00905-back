@@ -59,6 +59,13 @@ const getCurrentRepairByCarAtelier = async function(req, res) {
   const data = await carRepository.find(req.query);
   res.json(data);
 };
+const getCurrentRepairByCarClient = async function(req, res) {  
+  req.query.filter = [
+    {column: '_id' , value:ObjectID(req.query.id), comparator: '='}
+  ];
+  const data = await carRepository.find(req.query);
+  res.json(data);
+};
 const getRepairsAtelier = async function(req, res) {  
   req.query.filter = [
     {column: 'currentRepair' , value:true, comparator: 'exists'},
@@ -84,6 +91,7 @@ router.patch('/add_current_repair', createRouteCallback(addCurrentRepair));
 router.get('/current_repair_to_valid', createRouteCallback(getCurrentRepairToValid));
 router.patch('/valid_paiement', createRouteCallback(validPaiement));
 router.get('/atelier/current_repair', createRouteCallback(getCurrentRepairByCarAtelier));
+router.get('/client/current_repair', createRouteCallback(getCurrentRepairByCarClient));
 router.get('/atelier/repair', createRouteCallback(getRepairsAtelier));
 
 router.post('/test-body-parser',createBodySchemaParser(Car), createRouteCallback(testBodyParser));
