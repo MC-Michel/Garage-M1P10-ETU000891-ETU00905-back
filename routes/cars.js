@@ -6,6 +6,7 @@ const createBodySchemaParser = require('../middlewares/body-schema-parser');
 const Car = require('../models/car.model');
 const {assign} = require('../commons/database/methods/gen-reflect');
 const { ObjectID } = require('bson');
+const Constant = require('../models/constant.model');
 var router = express.Router();
 
 const carRepository = new GenRepository(Car);
@@ -42,7 +43,7 @@ const addCurrentRepair = async function(req, res) {
 const getCurrentRepairToValid = async function(req, res) {  
   req.query.filter = [
     {column: 'currentRepair' , value:true, comparator: 'exists'},
-    {column: 'currentRepair.status' , value:0, comparator: '='},
+    {column: 'currentRepair.status' , value:Constant.status.created, comparator: '='},
   ];
   const data = await carRepository.find(req.query);
   res.json(data);
@@ -61,7 +62,7 @@ const getCurrentRepairByCarAtelier = async function(req, res) {
 const getRepairsAtelier = async function(req, res) {  
   req.query.filter = [
     {column: 'currentRepair' , value:true, comparator: 'exists'},
-    {column: 'currentRepair.status' , value:1, comparator: '='},
+    {column: 'currentRepair.status' , value:Constant.status.validated, comparator: '='},
   ];
   const data = await carRepository.find(req.query);
   res.json(data);
