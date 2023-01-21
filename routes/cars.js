@@ -19,6 +19,8 @@ const getList = async function(req, res) {
 };
 
 const insertCar = async function(req, res) {
+  req.body.status = 0;
+  req.body.registrationDate = new Date();
   await carRepository.insert([req.body]);
   res.json({message: "Car created"});
 }
