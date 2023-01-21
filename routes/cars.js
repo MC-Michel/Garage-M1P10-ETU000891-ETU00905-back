@@ -24,7 +24,8 @@ const getListForCustomer = async function(req, res) {
   //   value: ObjectID(req.currentUser._id),
   //   comparator: '='
   // })
-  const data = await carRepository.find(req.query);
+  console.log(req.query)
+  const data = await carRepository.find(params);
   res.json(data);
 };
 const getListForAdmin = async function(req, res) {  

@@ -17,7 +17,6 @@ class GenRepository {
      */
     async insert(entities){
         const toInsert  = entities.map(elmt=> assign(this.entityClass, elmt));
-        console.log(toInsert)
         const collection = getConnection().collection(this.entityClass.collection);
         return await collection.insertMany(toInsert);
     }
@@ -53,8 +52,7 @@ class GenRepository {
                 projection[element]=0;
            });
         }
-        let queryOptions = {};
-        
+        let queryOptions = {}; 
         let createPaginationOptions = this.createPaginationOptions(params.pagination);
         queryOptions = {...queryOptions, ...createPaginationOptions};
       
@@ -83,7 +81,7 @@ class GenRepository {
             skip: pagination.pageElmtCount * (pagination.page-1),
             sort: pagination.orderBy.map(elmt => [elmt.column, elmt.order])
         } ;
-        console.log(ans);
+       
         return ans;
     }
     
@@ -118,7 +116,6 @@ class GenRepository {
             const f = {[filter.column]: { [comparators[filter.comparator]]: value}};
             return f;
         })
-        console.log(ans);
         return { [filterMode ==='or'?'$or': '$and']: ans };
     }
     parseValue(value, type){
