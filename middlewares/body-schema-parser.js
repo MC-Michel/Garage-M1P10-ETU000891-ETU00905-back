@@ -16,6 +16,7 @@ const Car = require('../models/car.model');
 function createBodySchemaParser(entityClass,schemaName='createSchemaDto', prefix=''){
     let ans = []
     const schema = entityClass[schemaName];
+    if(schema == null) throw new Error(`Unknown schema for ${entityClass.name}: ${schemaName}`)
     for(let key of Object.keys(schema)){
         
         let currentKey = prefix === ''? key: `${prefix}.${key}`

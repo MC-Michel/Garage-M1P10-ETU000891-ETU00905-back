@@ -7,9 +7,11 @@ const Car = require('../models/car.model');
 const {assign} = require('../commons/database/methods/gen-reflect');
 const { ObjectID } = require('bson');
 const Constant = require('../models/constant.model');
+const CarService = require('../services/car.service');
+const CustomError = require('../errors/custom-error');
 var router = express.Router();
 
-const carRepository = new GenRepository(Car);
+const carRepository = new GenRepository(Car);  
 
 const getList = async function(req, res) {  
   const data = await carRepository.find(req.query);
@@ -32,9 +34,13 @@ const deleteCar = async function (req, res) {
   await carRepository.delete(req.params.id);
   res.json({message: "Car deleted"});
 }
-const depositCar = async function(req, res) {
+const depositCar = async function(req, res) { 
+  req.body.status = 1;
+  const car = await CarService.findCoreCarById(req.body._id);
+  console.log(car);
+  if(car.status != 0) throw new CustomError(`La voiture ${car.numberPlate} n'est pas en circulation`);
   await carRepository.update(req.body);
-  res.json({message: "Car deposited"});
+  res.json({message: "Voiture deposee en attente de validation"});
 }
 const addCurrentRepair = async function(req, res) {
   await carRepository.update(req.body);
@@ -82,11 +88,11 @@ const testBodyParser = async function (req, res){
   res.json({message: "Done"});
 }
 router.get('', createRouteCallback(getList));
-router.post('', createRouteCallback(insertCar));
+router.post('',createBodySchemaParser(Car), createRouteCallback(insertCar));
 router.delete('/:id', createRouteCallback(deleteCar));
-router.patch('', createRouteCallback(updateCar));
+router.patch('',createBodySchemaParser(Car, 'updateSchemaDto'), createRouteCallback(updateCar));
 router.patch('/repairs_progression', createRouteCallback(updateCarRepairsProgression));
-router.patch('/deposit', createRouteCallback(depositCar));
+router.patch('/deposit',createBodySchemaParser(Car, 'depositDto'), createRouteCallback(depositCar));
 router.patch('/add_current_repair', createRouteCallback(addCurrentRepair));
 router.get('/current_repair_to_valid', createRouteCallback(getCurrentRepairToValid));
 router.patch('/valid_paiement', createRouteCallback(validPaiement));
