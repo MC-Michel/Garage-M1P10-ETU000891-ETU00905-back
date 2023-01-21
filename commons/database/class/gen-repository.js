@@ -31,7 +31,7 @@ class GenRepository {
     *               pageElmtCount: string,
     *               orderBy: {column: string, order: 'asc'|'desc'}[]
      *          },
-     *  filters?:[
+     *  filter?:[
      *      {
      *          column: string, 
      *          value: string,

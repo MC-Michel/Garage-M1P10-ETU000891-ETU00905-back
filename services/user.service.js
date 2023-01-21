@@ -44,6 +44,7 @@ module.exports = class UserService {
         return token.token
     }
 
+    //TODO: Generate a real token
     static generateTokenStr(user){
         return new Date().toString()+user._id;
     }

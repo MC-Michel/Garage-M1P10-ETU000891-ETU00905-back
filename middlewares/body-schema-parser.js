@@ -18,9 +18,14 @@ function createBodySchemaParser(entityClass,schemaName='createSchemaDto', prefix
     const schema = entityClass[schemaName];
     for(let key of Object.keys(schema)){
         
-        const currentKey = prefix === ''? key: `${prefix}.${key}`
+        let currentKey = prefix === ''? key: `${prefix}.${key}`
         if(schema[key].classConstructor){
+            if(schema[key].isArray) {
+                ans.push(body(currentKey).isArray().withMessage(currentKey+' doit etre une liste'));
+                currentKey = currentKey+".*"
+            }
             ans.push(...createBodySchemaParser(schema[key].classConstructor, schemaName, currentKey));
+            continue;
         }
         if(!schema[key].validatorGetter) continue;
         else{
