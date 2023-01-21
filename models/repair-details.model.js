@@ -1,9 +1,10 @@
 const {body} = require('express-validator'); 
+const RepairDetailsElmt = require('./repair-details-elmt.model');
 class RepairDetails {
     static schema ={
-        "ended": { type: 'array',  validatorGetter: (paramPropertyName='ended')=> body(paramPropertyName).isArray().withMessage("Elements de reparations termines invalides").toArray() },
-        "inprogress": { type: 'array',  validatorGetter: (paramPropertyName='inProgress')=> body(paramPropertyName).isArray().withMessage("Elements de reparations en cours invalides").toArray() },
-        "todo": { type: 'array', validatorGetter: (paramPropertyName='todo')=> body(paramPropertyName).isArray().withMessage("Elements de reparations a faire invalide").toDate() },
+        "ended": { classConstructor: RepairDetailsElmt, isArray: true },
+        "inprogress": { classConstructor: RepairDetailsElmt, isArray: true},
+        "todo": {classConstructor: RepairDetailsElmt, isArray: true },
         }
     static createSchemaDto = {...this.schema};
     static updateSchemaDto = {...this.schema};

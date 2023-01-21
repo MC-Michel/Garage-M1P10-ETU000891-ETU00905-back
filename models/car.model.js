@@ -13,7 +13,7 @@ class Car {
         //"weight": { type: 'int',  validatorGetter: (paramPropertyName='weight')=> body(paramPropertyName).isInt().withMessage("Poids invalide").toInt() },
         "status": { type: 'int',  validatorGetter: (paramPropertyName='status')=> body(paramPropertyName).isInt().withMessage("Statut invalide").toInt() },
         "registrationDate": { type: 'date', validatorGetter: (paramPropertyName='registrationDate')=> body(paramPropertyName).isISO8601().withMessage("Date d'enregistrement invalide").toDate() },
-        "currentRepair": { classConstructor: Repair}
+        "currentRepair": { classConstructor: Repair},
     }
     static createSchemaDto = (()=> { 
         const ans = {...this.schema}; 
