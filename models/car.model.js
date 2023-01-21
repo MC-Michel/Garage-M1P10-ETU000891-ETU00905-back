@@ -21,7 +21,12 @@ class Car {
         delete ans.status;
         delete ans.registrationDate;
         return ans;}) ();
-    static updateSchemaDto = {...this.schema, _id};
+    static updateSchemaDto =  (()=> { 
+        const ans = {...this.schema, _id}; 
+        delete ans.currentRepair; 
+        delete ans.status;
+        delete ans.registrationDate;
+        return ans;}) ();
     static depositDto = { _id }; 
     static collection = "Car";
 }
