@@ -13,7 +13,21 @@ var router = express.Router();
 
 const carRepository = new GenRepository(Car);  
 
-const getList = async function(req, res) {  
+const getListForCustomer = async function(req, res) {  
+  const params = req.query;
+  if(!params.filter) params.filter = [];
+
+  //TODO: uncomment the following
+  // params.filter.push({
+  //   column: 'userId',
+  //   type: 'string',
+  //   value: ObjectID(req.currentUser._id),
+  //   comparator: '='
+  // })
+  const data = await carRepository.find(req.query);
+  res.json(data);
+};
+const getListForAdmin = async function(req, res) {  
   const data = await carRepository.find(req.query);
   res.json(data);
 };
@@ -89,11 +103,14 @@ const testBodyParser = async function (req, res){
   console.log(assign(Car, req.body));
   res.json({message: "Done"});
 }
-router.get('', createRouteCallback(getList));
+router.get('/customer', createRouteCallback(getListForCustomer));
+router.get('/to-receive', createRouteCallback(getListForAdmin));
 router.post('',createBodySchemaParser(Car), createRouteCallback(insertCar));
 router.delete('/:id', createRouteCallback(deleteCar));
+
 router.patch('',createBodySchemaParser(Car, 'updateSchemaDto'), createRouteCallback(updateCar));
 router.patch('/repairs_progression', createRouteCallback(updateCarRepairsProgression));
+
 router.patch('/deposit',createBodySchemaParser(Car, 'depositDto'), createRouteCallback(depositCar));
 router.patch('/add_current_repair', createRouteCallback(addCurrentRepair));
 router.get('/current_repair_to_valid', createRouteCallback(getCurrentRepairToValid));
