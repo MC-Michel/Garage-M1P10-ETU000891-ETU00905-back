@@ -28,6 +28,7 @@ class Car {
         delete ans.registrationDate;
         return ans;}) ();
     static depositDto = { _id }; 
+    static repairUpdateDto = {  "currentRepair": { classConstructor: Repair}, _id } 
     static collection = "Car";
 }
 

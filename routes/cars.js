@@ -103,16 +103,21 @@ const testBodyParser = async function (req, res){
   console.log(assign(Car, req.body));
   res.json({message: "Done"});
 }
+
+router.delete('/:id', createRouteCallback(deleteCar));
+router.patch('',createBodySchemaParser(Car, 'updateSchemaDto'), createRouteCallback(updateCar));
+
+
 router.get('/customer', createRouteCallback(getListForCustomer));
 router.get('/to-receive', createRouteCallback(getListForAdmin));
 router.post('',createBodySchemaParser(Car), createRouteCallback(insertCar));
-router.delete('/:id', createRouteCallback(deleteCar));
 
-router.patch('',createBodySchemaParser(Car, 'updateSchemaDto'), createRouteCallback(updateCar));
-router.patch('/repairs_progression', createRouteCallback(updateCarRepairsProgression));
+
 
 router.patch('/deposit',createBodySchemaParser(Car, 'depositDto'), createRouteCallback(depositCar));
-router.patch('/add_current_repair', createRouteCallback(addCurrentRepair));
+router.patch('/add_current_repair',createBodySchemaParser(Car, 'repairUpdateDto'), createRouteCallback(addCurrentRepair));
+
+router.patch('/repairs_progression', createRouteCallback(updateCarRepairsProgression));
 router.get('/current_repair_to_valid', createRouteCallback(getCurrentRepairToValid));
 router.patch('/valid_paiement', createRouteCallback(validPaiement));
 router.get('/atelier/current_repair', createRouteCallback(getCurrentRepairByCarAtelier));
