@@ -4,14 +4,16 @@ const createRouteCallback = require('../commons/functions/create-route-callback'
 const { getConnection } = require('../configs/db');
 const createBodySchemaParser = require('../middlewares/body-schema-parser');
 const Car = require('../models/car.model');
+const RepairHistoric = require('../models/repair-historic.model');
 const {assign} = require('../commons/database/methods/gen-reflect');
-const { ObjectID } = require('bson');
+const { ObjectID, ObjectId } = require('bson');
 const Constant = require('../models/constant.model');
 const CarService = require('../services/car.service');
 const CustomError = require('../errors/custom-error');
 var router = express.Router();
 
-const carRepository = new GenRepository(Car);  
+const carRepository = new GenRepository(Car);
+const repairHistoricRepository = new GenRepository(RepairHistoric);  
 
 const getListForCustomer = async function(req, res) {  
   const params = req.query;
@@ -75,6 +77,14 @@ const validPaiement = async function(req, res) {
   await carRepository.update(req.body);
   res.json({message: "Car updated"});
 }
+const generateExitSlip = async function(req, res) {
+  let car = req.body;
+  let repairHistoric = car.currentRepair;
+  repairHistoric.carId = ObjectId(car._id);
+  await repairHistoricRepository.insert([repairHistoric]);
+  await carRepository.update(car);
+  res.json({message: "Car updated"});
+}
 const getCurrentRepairByCarAtelier = async function(req, res) {  
   req.query.filter = [
     {column: '_id' , value:ObjectID(req.query.id), comparator: '='}
@@ -121,6 +131,7 @@ router.patch('/add_current_repair',createBodySchemaParser(Car, 'repairUpdateDto'
 router.patch('/repairs_progression', createRouteCallback(updateCarRepairsProgression));
 router.get('/current_repair_to_valid', createRouteCallback(getCurrentRepairToValid));
 router.patch('/valid_paiement', createRouteCallback(validPaiement));
+router.patch('/exit_slip', createRouteCallback(generateExitSlip));
 router.get('/atelier/current_repair', createRouteCallback(getCurrentRepairByCarAtelier));
 router.get('/client/current_repair', createRouteCallback(getCurrentRepairByCarClient));
 router.get('/atelier/repair', createRouteCallback(getRepairsAtelier));
