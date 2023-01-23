@@ -27,11 +27,11 @@ const getListForCustomer = async function(req, res) {
   //   comparator: '='
   // })
   console.log(req.query)
-  const data = await carRepository.find(params);
+  const data = await CarService.findCoreCars(params);
   res.json(data);
 };
 const getListForAdmin = async function(req, res) {  
-  const data = await carRepository.find(req.query);
+  const data = await CarService.findCoreCars(req.query);
   res.json(data);
 };
 
@@ -50,7 +50,7 @@ const updateCarRepairsProgression = async function(req, res) {
   res.json({message: "Car updated"});
 }
 const deleteCar = async function (req, res) {
-  await carRepository.delete(req.params.id);
+  await carRepository.softDelete(req.params._id);
   res.json({message: "Car deleted"});
 }
 const depositCar = async function(req, res) { 

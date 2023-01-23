@@ -18,6 +18,21 @@ module.exports = class CarService {
         return result.data[0];
     }
 
+    static async findCoreCars(params){
+        
+        const excludeFields = ['currentRepair'];
+        params.excludeFields = ['currentRepair'];
+        if(!params.filter) params.filter = []
+        params.filter.push({
+            column: 'deletedAt',
+            type:'date',
+            comparator: 'notExistsOrNull'
+        });
+        const result = await carRepository.find(params);
+        if(result.data.length === 0) return null;
+        return result.data[0];
+    }
+
     
 }
 

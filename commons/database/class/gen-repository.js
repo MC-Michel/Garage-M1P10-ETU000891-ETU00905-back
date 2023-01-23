@@ -105,13 +105,15 @@ class GenRepository {
             ">": "$gt",
             "<=": "$lte",
             ">=": "$gte",
-            "exists" : "$exists"
+            "exists" : "$exists",
         };
         
        const ans = filters.map(filter => {
             const value=this.parseValue(filter.value, filter.type);
             if(filter.comparator === "like"){
                 return {[filter.column]:{'$regex': value, '$options': 'i' }};
+            }if(filter.comparator === "notExistsOrNull"){
+                return {[filter.column]:{'$or': [ {$exists: false}, {$eq: null}] }};
             }
             const f = {[filter.column]: { [comparators[filter.comparator]]: value}};
             return f;
@@ -124,6 +126,11 @@ class GenRepository {
         if(type === "date")
             return new Date(value);
         return value;
+    }
+    async softDelete(id){
+        const collection = this.getCollection();
+        const deletedAt = new Date();
+        return await collection.updateOne({_id: ObjectID(id)}, {$set: {deletedAt}});
     }
 }
 
