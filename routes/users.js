@@ -7,6 +7,7 @@ const createBodySchemaParser = require('../middlewares/body-schema-parser');
 const User = require('../models/user.model'); 
 const TokenRepository = require('../repositories/token.repo');
 const UserService = require('../services/user.service');
+const MailerService = require('../services/mailer.service');
 const createAuth = require('../middlewares/auth');
 var router = express.Router();
 
@@ -19,6 +20,9 @@ const signin = async function (req, res){
         throw new CustomError('Les 2 mots de passes sont differentes')
     newUser.roleId = 1;
     await userRepository.insert([newUser]);
+    // Send mail
+    let mail = UserService.buildSigninMail(newUser);
+    await MailerService.sendMail(mail);
     res.json({message: "Client enregistré"});
 }
 
