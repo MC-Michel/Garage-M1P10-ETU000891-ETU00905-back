@@ -23,8 +23,7 @@ const getListForCustomer = async function(req, res) {
   //   type: 'string',
   //   value: ObjectID(req.currentUser._id),
   //   comparator: '='
-  // })
-  console.log(req.query)
+  // })  
   const data = await carRepository.find(params);
   res.json(data);
 };
@@ -54,10 +53,16 @@ const deleteCar = async function (req, res) {
 const depositCar = async function(req, res) { 
   req.body.status = 1;
   const car = await CarService.findCoreCarById(req.body._id);
-  console.log(car);
+ 
   if(car.status != 0) throw new CustomError(`La voiture ${car.numberPlate} n'est pas en circulation`);
   await carRepository.update(req.body);
   res.json({message: "Voiture deposee en attente de validation"});
+}
+
+const getById = async function (req, res){
+  const car = await CarService.findCoreCarById(req.params.id);
+  if(car == null) throw new CustomError(`Aucune voiture correspondante a l'id ${req.params.id}`);
+  res.json(car);
 }
 const addCurrentRepair = async function(req, res) {
   await carRepository.update(req.body);
@@ -105,12 +110,14 @@ const testBodyParser = async function (req, res){
   res.json({message: "Done"});
 }
 
+
 router.delete('/:id', createRouteCallback(deleteCar));
 router.patch('',createBodySchemaParser(Car, 'updateSchemaDto'), createRouteCallback(updateCar));
 
 
 router.get('/customer', createRouteCallback(getListForCustomer));
 router.get('/to-receive', createRouteCallback(getListForAdmin));
+router.get('/customer/:id', createRouteCallback(getById))
 router.post('',createBodySchemaParser(Car), createRouteCallback(insertCar));
 
 
