@@ -1,6 +1,7 @@
 const GenRepository = require("../commons/database/class/gen-repository");
 const { addDays } = require("../commons/functions/gen-date");
 const CustomError = require("../errors/custom-error")
+const md5 = require("md5");
 const User = require("../models/user.model");
 const TokenRepository = require("../repositories/token.repo");
 
@@ -46,7 +47,7 @@ module.exports = class UserService {
 
     //TODO: Generate a real token
     static generateTokenStr(user){
-        return new Date().toString()+user._id;
+        return md5(new Date().toString()+user._id);
     }
 
 
