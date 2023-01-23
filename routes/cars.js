@@ -49,18 +49,22 @@ const updateCarRepairsProgression = async function(req, res) {
   res.json({message: "Car updated"});
 }
 const deleteCarCustomer = async function (req, res) {
-  const car = await CarService.findCoreCarById(req.params.id);
-  if(car.deletedAt) throw new CustomError('La voiture a deja ete supprimee');
-  if(car.userId !== req.currentUser._id) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'user actuel`);
-  await carRepository.softDelete(req.params.id);
-  res.json({message: "Voiture retiree"});
+  try {
+    const car = await CarService.findCoreCarById(req.params.id);
+    if(car.deletedAt) throw new CustomError('La voiture a déjà ete supprimée');
+    if(!car.userId.equals(req.currentUser._id)) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'utilisateur actuel`);
+    await carRepository.softDelete(req.params.id);
+    res.json({message: "Voiture retirée"});
+  } catch (error) {
+    console.log(error);
+  }
 }
 const depositCar = async function(req, res) { 
   req.body.status = 1;
   const car = await CarService.findCoreCarById(req.body._id);
  
   if(car.status != 0) throw new CustomError(`La voiture ${car.numberPlate} n'est pas en circulation`);
-  if(car.userId !== req.currentUser._id) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'user actuel`);
+  if(!car.userId.equals(req.currentUser._id)) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'utilisateur actuel`);
   await carRepository.update(req.body);
   res.json({message: "Voiture deposee en attente de validation"});
 }
