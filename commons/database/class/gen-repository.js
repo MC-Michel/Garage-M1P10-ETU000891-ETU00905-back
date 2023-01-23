@@ -58,17 +58,19 @@ class GenRepository {
       
       
         const filters = this.createMatchOptions(params.filter, params.filterMode)
-      
+        
         const collection = this.getCollection();
         const results = await collection.find(filters,queryOptions).project(projection).toArray();
          
-        return {
+        const ans =  {
             data: results
                 .map(elmt => Object.assign(new this.entityClass, elmt)),
             meta: {
                 totalElmtCount: (await collection.countDocuments(filters))
             }
         };
+        console.log(ans)
+        return ans;
     } 
 
 
@@ -113,7 +115,7 @@ class GenRepository {
             if(filter.comparator === "like"){
                 return {[filter.column]:{'$regex': value, '$options': 'i' }};
             }if(filter.comparator === "notExistsOrNull"){
-                return {[filter.column]:{'$or': [ {$exists: false}, {$eq: null}] }};
+                return {'$or': [ { [filter.column]:{$exists: false}}, { [filter.column]:{$eq: null}}] };
             }
             const f = {[filter.column]: { [comparators[filter.comparator]]: value}};
             return f;

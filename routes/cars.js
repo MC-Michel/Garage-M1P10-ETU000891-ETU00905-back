@@ -18,15 +18,13 @@ const repairHistoricRepository = new GenRepository(RepairHistoric);
 const getListForCustomer = async function(req, res) {  
   const params = req.query;
   if(!params.filter) params.filter = [];
-
   //TODO: uncomment the following
   // params.filter.push({
   //   column: 'userId',
   //   type: 'string',
   //   value: ObjectID(req.currentUser._id),
   //   comparator: '='
-  // })
-  console.log(req.query)
+  // }) 
   const data = await CarService.findCoreCars(params);
   res.json(data);
 };
@@ -49,15 +47,20 @@ const updateCarRepairsProgression = async function(req, res) {
   await carRepository.update(req.body);
   res.json({message: "Car updated"});
 }
-const deleteCar = async function (req, res) {
-  await carRepository.softDelete(req.params._id);
-  res.json({message: "Car deleted"});
+const deleteCarCustomer = async function (req, res) {
+  const car = await CarService.findCoreCarById(req.params.id);
+  if(car.deletedAt) throw new CustomError('La voiture a deja ete supprimee');
+  //TODO: uncomment this
+  //if(car.userId !== req.currentUser._id) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'user actuel`);
+  await carRepository.softDelete(req.params.id);
+  res.json({message: "Voiture retiree"});
 }
 const depositCar = async function(req, res) { 
   req.body.status = 1;
   const car = await CarService.findCoreCarById(req.body._id);
-  console.log(car);
   if(car.status != 0) throw new CustomError(`La voiture ${car.numberPlate} n'est pas en circulation`);
+  //TODO: uncomment this
+  //if(car.userId !== req.currentUser._id) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'user actuel`);
   await carRepository.update(req.body);
   res.json({message: "Voiture deposee en attente de validation"});
 }
@@ -115,7 +118,7 @@ const testBodyParser = async function (req, res){
   res.json({message: "Done"});
 }
 
-router.delete('/:id', createRouteCallback(deleteCar));
+router.delete('/customer/:id', createRouteCallback(deleteCarCustomer));
 router.patch('',createBodySchemaParser(Car, 'updateSchemaDto'), createRouteCallback(updateCar));
 
 
