@@ -33,9 +33,9 @@ module.exports = class RepairHistoryRepository extends GenRepository {
            
         ]
     } 
-    findHistoryCaRepair(groupByValueLimit, groupByType){
+    async findHistoryCaRepair(groupByValueLimit, groupByType){
         const collection = this.getCollection();
-        collection.aggregate([
+        const results =   await collection.aggregate([
             ...this.generateBaseAggrForGroup(groupByValueLimit,groupByType),
             {
                 $unwind: "$ended"
@@ -46,19 +46,25 @@ module.exports = class RepairHistoryRepository extends GenRepository {
                     "amount": {$sum: "$ended.price" }
                 }
             }
-        ])
+        ]).toArray();
+        const ans = {};
+        results.map(elmt => ans[elmt._id] = elmt)
+        return ans;
     }
-    findHistoryRepairNumber(groupByValueLimit, groupByType){
+    async findHistoryRepairNumber(groupByValueLimit, groupByType){
         const collection = this.getCollection();
-        collection.aggregate([
+        const results =    await collection.aggregate([
             ...this.generateBaseAggrForGroup(groupByValueLimit,groupByType),
             {
                 $group: {
                     "_id": "$timePeriod",
-                    "amount": {$sum: 1 }
+                    "count": {$sum: 1 }
                 }
             }
-        ])
+        ]).toArray();
+        const ans = {};
+        results.map(elmt => ans[elmt._id] = elmt)
+        return ans;
     }
   
 

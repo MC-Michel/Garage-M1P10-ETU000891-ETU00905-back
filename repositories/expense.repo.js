@@ -2,6 +2,7 @@ const GenRepository = require("../commons/database/class/gen-repository");
 const { formatAndTrunc } = require("../commons/functions/gen-date");
 const { getConnection } = require("../configs/db");
 const Car = require("../models/car.model");
+const Expenses = require("../models/expenses.model");
 const vars = {
     "year": {
         timePeriodFormat: "%Y-%m",
@@ -12,22 +13,18 @@ const vars = {
         timePeriodFormatForFilter: "%Y-%m",
     }
 }
-module.exports = class CarRepository extends GenRepository {
+module.exports = class ExpensesRepository extends GenRepository {
     constructor(){
-        super(Car);
+        super(Expenses);
     }
 
     generateBaseAggrForGroup(groupByValueLimit,groupByType){
         return [
             {
                 $addFields: {
-                    timePeriod: { $dateToString: {format: vars[groupByType].timePeriodFormat, date: "$currentRepair.receptionDate"} },
-                    timePeriodForFilter:  { $dateToString: {format: vars[groupByType].timePeriodFormatForFilter, date: "$currentRepair.receptionDate"} },
-                    ended : "$currentRepair.repairs.ended"
+                    timePeriod: { $dateToString: {format: vars[groupByType].timePeriodFormat, date: "$expensesDate"} },
+                    timePeriodForFilter:  { $dateToString: {format: vars[groupByType].timePeriodFormatForFilter, date: "$expensesDate"} },
                 }
-            },
-            {
-                $project: { "currentRepair": 0 }
             },
             {
                 $match: { timePeriodForFilter: {$eq: formatAndTrunc(groupByValueLimit, groupByType)}, currentRepair: {$and: [{$exists: true}, {$ne: null}]}}
@@ -37,35 +34,20 @@ module.exports = class CarRepository extends GenRepository {
     } 
     async findCurrentCaRepair(groupByValueLimit, groupByType){
         const collection = this.getCollection();
-        const results = await collection.aggregate([
+        const results= await collection.aggregate([
             ...this.generateBaseAggrForGroup(groupByValueLimit,groupByType),
             {
-                $unwind: "$ended"
+                $unwind: "$details"
             },
             {
                 $group: {
                     "_id": "$timePeriod",
-                    "amount": {$sum: "$ended.price" }
+                    "amount": {$sum: "$details.price" }
                 }
             }
         ]).toArray();
         const ans = {};
-        results.map(elmt => ans[elmt._id] = elmt);
-        return ans;
-    }
-    async findCurrentCarNumberRepair(groupByValueLimit, groupByType){
-        const collection = this.getCollection();
-        const results = await collection.aggregate([
-            ...this.generateBaseAggrForGroup(groupByValueLimit,groupByType),
-            {
-                $group: {
-                    "_id": "$timePeriod",
-                    "count": {$sum: 1 }
-                }
-            }
-        ]).toArray();
-        const ans = {};
-        results.map(elmt => ans[elmt._id] = elmt);
+        results.map(elmt=>ans[elmt._id]=elmt)
         return ans;
     }
   
