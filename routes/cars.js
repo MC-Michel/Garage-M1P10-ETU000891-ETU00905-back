@@ -10,6 +10,7 @@ const { ObjectID, ObjectId } = require('bson');
 const Constant = require('../models/constant.model');
 const CarService = require('../services/car.service');
 const CustomError = require('../errors/custom-error');
+const createAuth = require('../middlewares/auth');
 var router = express.Router();
 
 const carRepository = new GenRepository(Car);
@@ -18,13 +19,12 @@ const repairHistoricRepository = new GenRepository(RepairHistoric);
 const getListForCustomer = async function(req, res) {  
   const params = req.query;
   if(!params.filter) params.filter = [];
-  //TODO: uncomment the following
-  // params.filter.push({
-  //   column: 'userId',
-  //   type: 'string',
-  //   value: ObjectID(req.currentUser._id),
-  //   comparator: '='
-  // }) 
+  params.filter.push({
+    column: 'userId',
+    type: 'string',
+    value: ObjectID(req.currentUser._id),
+    comparator: '='
+  }) 
   const data = await CarService.findCoreCars(params);
   res.json(data);
 };
@@ -36,6 +36,7 @@ const getListForAdmin = async function(req, res) {
 const insertCar = async function(req, res) {
   req.body.status = 0;
   req.body.registrationDate = new Date();
+  req.body.userId = req.currentUser._id;
   await carRepository.insert([req.body]);
   res.json({message: "Car created"});
 }
@@ -50,8 +51,7 @@ const updateCarRepairsProgression = async function(req, res) {
 const deleteCarCustomer = async function (req, res) {
   const car = await CarService.findCoreCarById(req.params.id);
   if(car.deletedAt) throw new CustomError('La voiture a deja ete supprimee');
-  //TODO: uncomment this
-  //if(car.userId !== req.currentUser._id) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'user actuel`);
+  if(car.userId !== req.currentUser._id) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'user actuel`);
   await carRepository.softDelete(req.params.id);
   res.json({message: "Voiture retiree"});
 }
@@ -60,8 +60,7 @@ const depositCar = async function(req, res) {
   const car = await CarService.findCoreCarById(req.body._id);
  
   if(car.status != 0) throw new CustomError(`La voiture ${car.numberPlate} n'est pas en circulation`);
-  //TODO: uncomment this
-  //if(car.userId !== req.currentUser._id) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'user actuel`);
+  if(car.userId !== req.currentUser._id) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'user actuel`);
   await carRepository.update(req.body);
   res.json({message: "Voiture deposee en attente de validation"});
 }
@@ -125,18 +124,18 @@ const testBodyParser = async function (req, res){
   res.json({message: "Done"});
 }
 
-router.delete('/customer/:id', createRouteCallback(deleteCarCustomer));
+router.delete('/customer/:id', createAuth(), createRouteCallback(deleteCarCustomer));
 router.patch('',createBodySchemaParser(Car, 'updateSchemaDto'), createRouteCallback(updateCar));
 
 
-router.get('/customer', createRouteCallback(getListForCustomer));
+router.get('/customer', createAuth(), createRouteCallback(getListForCustomer));
 router.get('/to-receive', createRouteCallback(getListForAdmin));
 router.get('/customer/:id', createRouteCallback(getById))
-router.post('',createBodySchemaParser(Car), createRouteCallback(insertCar));
+router.post('', createAuth(), createBodySchemaParser(Car), createRouteCallback(insertCar));
 
 
 
-router.patch('/deposit',createBodySchemaParser(Car, 'depositDto'), createRouteCallback(depositCar));
+router.patch('/deposit', createAuth(),createBodySchemaParser(Car, 'depositDto'), createRouteCallback(depositCar));
 router.patch('/add_current_repair',createBodySchemaParser(Car, 'repairUpdateDto'), createRouteCallback(addCurrentRepair));
 
 router.patch('/repairs_progression', createRouteCallback(updateCarRepairsProgression));
