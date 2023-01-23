@@ -8,7 +8,11 @@ const repairHistoricRepository = new GenRepository(RepairHistoric);
 
 const getListForCustomer = async function(req, res) {  
   const params = req.query;
+  const carId = req.params.carId;
   if(!params.filter) params.filter = [];
+  params.filter.push(
+    {column: 'carId' , value: carId, comparator: '='},
+  );
   const data = await repairHistoricRepository.find(params);
   res.json(data);
 };
@@ -18,7 +22,7 @@ const getListForAdmin = async function(req, res) {
 };
 
 
-router.get('/customer', createRouteCallback(getListForCustomer));
+router.get('/:carId/customer', createRouteCallback(getListForCustomer));
 router.get('/admin', createRouteCallback(getListForAdmin));
 
 module.exports = router;
