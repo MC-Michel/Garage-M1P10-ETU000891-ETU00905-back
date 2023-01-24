@@ -1,6 +1,6 @@
 const { query } = require("express-validator");
 const GenRepository = require("../commons/database/class/gen-repository");
-const { generateDaysOfMonth, generateDaysOfYear, formatAndTrunc } = require("../commons/functions/gen-date");
+const { generateDaysOfMonth, generateMonthsOfYear, formatAndTrunc } = require("../commons/functions/gen-date");
 const CustomError = require("../errors/custom-error");
 const CarRepository = require("../repositories/car.repo");
 const ExpensesRepository = require("../repositories/expense.repo");
@@ -19,8 +19,9 @@ module.exports = class StatsService{
     static async findCaExpensesStats(groupByValueLimit, groupByType){
         let ansDates;
         if(groupByType === "month") ansDates = generateDaysOfMonth(groupByValueLimit);
-        else if(groupByType === "year") ansDates = generateDaysOfYear(groupByValueLimit);
+        else if(groupByType === "year") ansDates = generateMonthsOfYear(groupByValueLimit);
         else throw new CustomError("Parametre de groupe inconnu: "+groupByType);
+        console.log(ansDates)
 
         const caCurrent = await carRepository.findCurrentCaRepair(groupByValueLimit, groupByType);
         const repairCountCurrent = await carRepository.findCurrentCarNumberRepair(groupByValueLimit, groupByType);
@@ -43,6 +44,7 @@ module.exports = class StatsService{
             newRow.ca = currentCa + historyCa;
             newRow.repairCount = currentRepairCount + historyRepairCount;
             newRow.expenses = expenses[dateKey] ? expenses[dateKey].amount : 0;
+            newRow.benef = newRow.ca - newRow.expenses;
             ans.push(newRow);
         })
         return ans;

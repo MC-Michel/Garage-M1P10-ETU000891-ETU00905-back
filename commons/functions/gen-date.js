@@ -4,10 +4,10 @@ module.exports.addDays = function (date, days){
     return ans;
 }
 
-module.exports.generateMonthsOfYear = function (year){
+module.exports.generateMonthsOfYear = function (refDate){
     const dates = [];
     for(let i=1;i<13;i++) {
-      dates.push(new Date(year, i, 1));
+      dates.push(new Date(refDate.getFullYear(), i, 1));
     }
     return dates;
 }
@@ -18,8 +18,8 @@ module.exports.generateTruncMonthsOfYear = function (refDate){
 
 module.exports.generateDaysOfMonth = function (refDate){
     const month = refDate.getMonth();
-    const year = refDate.getYear();
-    const date = new Date(year, month, 1);
+    const year = refDate.getFullYear();
+    const date = new Date(year, month, 1, 0,0,0,0);
     const dates = [];
 
     while (date.getMonth() === month) {
@@ -34,7 +34,7 @@ module.exports.generateTruncDaysOfMonth = function (refDate){
 }
 
 module.exports.formatAndTrunc = function (date, truncTo){
-    const year = date.getYear();
+    const year = date.getFullYear();
     const month = date.getMonth()+1
     let ans = year.toString();
     if(truncTo === 'year') return ans;
