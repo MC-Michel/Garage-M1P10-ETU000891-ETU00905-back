@@ -7,8 +7,9 @@ class Constant {
         validated : 1
     };
     static carStatus = {
-        created : 0,
-        deposited : 1
+        inCirculation : 0, 
+        deposited : 1,
+        inReparation: 2
     };
     static repairStatus = {
         todo : 0,

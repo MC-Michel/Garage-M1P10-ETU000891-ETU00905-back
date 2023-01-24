@@ -34,7 +34,7 @@ const getListForAdmin = async function(req, res) {
 };
 
 const insertCar = async function(req, res) {
-  req.body.status = 0;
+  req.body.status = Constant.carStatus.inCirculation;
   req.body.registrationDate = new Date();
   req.body.userId = req.currentUser._id;
   await carRepository.insert([req.body]);
@@ -57,7 +57,7 @@ const deleteCarCustomer = async function (req, res) {
   res.json({message: "Voiture retirée"});
 }
 const depositCar = async function(req, res) { 
-  req.body.status = 1;
+  req.body.status = Constant.carStatus.deposited;
   const car = await CarService.findCoreCarById(req.body._id);
  
   if(car.status != 0) throw new CustomError(`La voiture ${car.numberPlate} n'est pas en circulation`);
