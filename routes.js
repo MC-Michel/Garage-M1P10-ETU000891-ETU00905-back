@@ -5,6 +5,7 @@ const repairsHistoricRoutes = require('./routes/repairs-historic')
 const rapairsRoutes = require('./routes/repairs')
 const expensesRoutes = require('./routes/expenses')
 const usersRoutes = require('./routes/users')
+const statsRoutes = require('./routes/stats');
 
 module.exports = function (app){
     app.use("/cars", carsRoutes);
@@ -13,4 +14,5 @@ module.exports = function (app){
     app.use("/repairs", rapairsRoutes);
     app.use("/expenses", expensesRoutes);
     app.use("/users", usersRoutes);
+    app.use("/stats", statsRoutes)
 }

@@ -32,7 +32,7 @@ module.exports = class ExpensesRepository extends GenRepository {
            
         ]
     } 
-    async findCurrentCaRepair(groupByValueLimit, groupByType){
+    async findExpensesStats(groupByValueLimit, groupByType){
         const collection = this.getCollection();
         const results= await collection.aggregate([
             ...this.generateBaseAggrForGroup(groupByValueLimit,groupByType),
