@@ -50,6 +50,7 @@ const updateCarRepairsProgression = async function(req, res) {
 }
 const deleteCarCustomer = async function (req, res) {
   const car = await CarService.findCoreCarById(req.params.id);
+  if(!car) throw new CustomError('Aucune voiture correspondante');
   if(car.deletedAt) throw new CustomError('La voiture a déjà ete supprimée');
   if(!car.userId.equals(req.currentUser._id)) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'utilisateur actuel`);
   await carRepository.softDelete(req.params.id);
