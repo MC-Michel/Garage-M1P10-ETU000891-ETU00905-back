@@ -71,7 +71,19 @@ class GenRepository {
         };
         console.log(ans)
         return ans;
-    } 
+    }
+
+    async findById(_id){
+        const filter = [{
+            column: '_id',
+            type: 'string',
+            value: ObjectID(_id),
+            comparator: '='
+        }];
+        const result = await this.find({filter});
+        if(result.data.length === 0) return null;
+        return result.data[0];
+    }
 
 
     createPaginationOptions(pagination){ 

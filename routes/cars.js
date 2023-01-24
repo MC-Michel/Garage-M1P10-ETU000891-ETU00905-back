@@ -131,7 +131,7 @@ router.patch('',createBodySchemaParser(Car, 'updateSchemaDto'), createRouteCallb
 
 router.get('/customer', createAuth(), createRouteCallback(getListForCustomer));
 router.get('/to-receive', createRouteCallback(getListForAdmin));
-router.get('/customer/:id', createRouteCallback(getById))
+router.get('/customer/:id', createRouteCallback(getById));
 router.post('', createAuth(), createBodySchemaParser(Car), createRouteCallback(insertCar));
 
 

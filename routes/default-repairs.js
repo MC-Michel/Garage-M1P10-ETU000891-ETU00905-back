@@ -17,6 +17,16 @@ const getListForAdmin = async function(req, res) {
   const data = await repository.find(req.query);
   res.json(data);
 };
+const getById = async function (req, res){
+  const defaultRepair = await repository.findById(req.params.id);
+  if(defaultRepair == null) throw new CustomError(`Aucune réparation correspondante a l'id ${req.params.id}`);
+  res.json(defaultRepair);
+}
+const getByIdAdmin = async function (req, res){
+  const defaultRepair = await repository.findById(req.params.id);
+  if(defaultRepair == null) throw new CustomError(`Aucune réparation correspondante a l'id ${req.params.id}`);
+  res.json(defaultRepair);
+}
 
 const insert = async function(req, res) {
   req.body.status = 0;
@@ -39,6 +49,8 @@ router.patch('',createBodySchemaParser(DefaultRepair, 'updateSchemaDto'), create
 
 router.get('/customer', createRouteCallback(getListForCustomer));
 router.get('/admin', createRouteCallback(getListForAdmin));
+router.get('/customer/:id', createRouteCallback(getById));
+router.get('/admin/:id', createRouteCallback(getByIdAdmin));
 router.post('',createBodySchemaParser(DefaultRepair), createRouteCallback(insert));
 
 module.exports = router;
