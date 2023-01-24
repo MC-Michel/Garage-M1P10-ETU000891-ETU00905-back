@@ -49,15 +49,11 @@ const updateCarRepairsProgression = async function(req, res) {
   res.json({message: "Car updated"});
 }
 const deleteCarCustomer = async function (req, res) {
-  try {
-    const car = await CarService.findCoreCarById(req.params.id);
-    if(car.deletedAt) throw new CustomError('La voiture a déjà ete supprimée');
-    if(!car.userId.equals(req.currentUser._id)) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'utilisateur actuel`);
-    await carRepository.softDelete(req.params.id);
-    res.json({message: "Voiture retirée"});
-  } catch (error) {
-    console.log(error);
-  }
+  const car = await CarService.findCoreCarById(req.params.id);
+  if(car.deletedAt) throw new CustomError('La voiture a déjà ete supprimée');
+  if(!car.userId.equals(req.currentUser._id)) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'utilisateur actuel`);
+  await carRepository.softDelete(req.params.id);
+  res.json({message: "Voiture retirée"});
 }
 const depositCar = async function(req, res) { 
   req.body.status = 1;
