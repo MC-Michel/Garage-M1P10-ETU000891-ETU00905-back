@@ -27,7 +27,7 @@ module.exports = class ExpensesRepository extends GenRepository {
                 }
             },
             {
-                $match: { timePeriodForFilter: {$eq: formatAndTrunc(groupByValueLimit, groupByType)}, currentRepair: {$and: [{$exists: true}, {$ne: null}]}}
+                $match: { timePeriodForFilter: {$eq: formatAndTrunc(groupByValueLimit, groupByType)}, $and:  [{currentRepair: {$exists: true}}, {currentRepair:{$ne: null}}]}
             },
            
         ]

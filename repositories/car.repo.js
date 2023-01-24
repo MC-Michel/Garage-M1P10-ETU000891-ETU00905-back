@@ -30,7 +30,7 @@ module.exports = class CarRepository extends GenRepository {
                 $project: { "currentRepair": 0 }
             },
             {
-                $match: { timePeriodForFilter: {$eq: formatAndTrunc(groupByValueLimit, groupByType)}, currentRepair: {$and: [{$exists: true}, {$ne: null}]}}
+                $match: { timePeriodForFilter: {$eq: formatAndTrunc(groupByValueLimit, groupByType)}, $and: [{currentRepair: {$exists: true}}, {currentRepair:{$ne: null}}]}
             },
            
         ]
