@@ -20,8 +20,7 @@ module.exports = class StatsService{
         let ansDates;
         if(groupByType === "month") ansDates = generateDaysOfMonth(groupByValueLimit);
         else if(groupByType === "year") ansDates = generateMonthsOfYear(groupByValueLimit);
-        else throw new CustomError("Parametre de groupe inconnu: "+groupByType);
-        console.log(ansDates)
+        else throw new CustomError("Parametre de groupe inconnu: "+groupByType); 
 
         const caCurrent = await carRepository.findCurrentCaRepair(groupByValueLimit, groupByType);
         const repairCountCurrent = await carRepository.findCurrentCarNumberRepair(groupByValueLimit, groupByType);
