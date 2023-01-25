@@ -6,7 +6,7 @@ module.exports.addDays = function (date, days){
 
 module.exports.generateMonthsOfYear = function (refDate){
     const dates = [];
-    for(let i=1;i<13;i++) {
+    for(let i=0;i<12;i++) {
       dates.push(new Date(Date.UTC(refDate.getFullYear(), i, 1)));
     }
     return dates;
