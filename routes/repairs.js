@@ -6,6 +6,7 @@ const createBodySchemaParser = require('../middlewares/body-schema-parser');
 const Repair = require('../models/repair.model');
 const {assign} = require('../commons/database/methods/gen-reflect');
 const PdfService = require('../services/pdf.service');
+const { query } = require('express-validator');
 var router = express.Router();
 
 const repairRepository = new GenRepository(Repair);
@@ -29,7 +30,8 @@ const deleteRepair = async function (req, res) {
 }
 
 const createInvoice = async function (req, res){
-  const invoiceStream = await PdfService.generateInvoice();
+  const repairId = req.params.repairId;
+  const invoiceStream = await PdfService.generateInvoice(repairId);
   res.attachment('facture.pdf');
   invoiceStream.pipe(res);
 }
@@ -46,7 +48,7 @@ router.get('', createRouteCallback(getList));
 router.post('', createRouteCallback(insertRepair));
 router.delete('/:id', createRouteCallback(deleteRepair));
 router.patch('', createRouteCallback(updateRepair));
-router.get('/invoice', createRouteCallback(createInvoice))
+router.get('/invoice/:repairId', createRouteCallback(createInvoice))
 
 // Financier
 router.get('/valid', createRouteCallback(getList));

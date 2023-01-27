@@ -16,7 +16,15 @@ module.exports = class CarRepository extends GenRepository {
     constructor(){
         super(Car);
     }
+    async findCurrentRepair(repairId){
+        const filter = {
+            'currentRepair._id': repairId
+        };
+        const result = await this.find({filter});
+        if(result.data.length == 0) return null;
+        return result.data[0].currentRepair;
 
+    }
     generateBaseAggrForGroup(groupByValueLimit,groupByType){
         return [
             {

@@ -59,9 +59,9 @@
             </td>
             <td style="padding: 1em; border: none;">
                 <h1>Facture</h1>
-                <p>Date: 01/01/2023</p>
-                <p>Nom: Rakoto Jean</p>
-                <p>Email: rakoto.jean@gmail.com</p>
+                <p>Date: {{repair.receptionDate}}</p>
+                <p>Nom: {{user.firstName}} {{user.lastName}}</p>
+                <p>Email: {{user.email}}</p>
             </td>
         </tr>
 
@@ -77,9 +77,9 @@
           <th>Description</th> 
         </tr>
         <tr>
-            <td>TOYOTA</td>
-            <td>6565TBD</td>
-            <td>AE86</td>
+            <td>{{car.brand}}</td>
+            <td>{{car.numberPlate}}</td>
+            <td>{{car.description}}</td>
         </tr>
    </table>
 
@@ -91,31 +91,20 @@
         <th>Reparation</th>
         <th>Description</th>
         <th>Prix</th>
-        <th>Total</th>
+        
+      </tr>
+      {{reparationElmtsDada.html}}
+      <tr>
+        <td colspan="2" style="text-align: right">Total</td>
+        <td>Ar {{reparationElmtsDada.total}}</td>
       </tr>
       <tr>
-        <td>Product 1</td>
-        <td>2</td>
-        <td>$10.00</td>
-        <td>$20.00</td>
-      </tr>
-      <tr>
-        <td>Product 2</td>
-        <td>1</td>
-        <td>$5.00</td>
-        <td>$5.00</td>
-      </tr>
-      <tr>
-        <td colspan="3" style="text-align: right">Subtotal</td>
-        <td>$25.00</td>
-      </tr>
-      <tr>
-        <td colspan="3" style="text-align: right">Tax (10%)</td>
-        <td>$2.50</td>
+        <td colspan="3" style="text-align: right">Tax ({{reparationElmtsDada.tvaRate}}%)</td>
+        <td>Ar {{reparationElmtsDada.tva}}</td>
       </tr>
       <tr>
         <td colspan="3" style="text-align: right">Total</td>
-        <td>$27.50</td>
+        <td>Ar {{reparationElmtsDada.ttc}}</td>
       </tr>
     </table>
 
