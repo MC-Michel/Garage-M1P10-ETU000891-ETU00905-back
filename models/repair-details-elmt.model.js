@@ -4,6 +4,7 @@ class RepairDetailsElmt {
             "label" : { type: 'string',  validatorGetter: (paramPropertyName='label')=> body(paramPropertyName).isString().withMessage("Label d'elements de reparations invalides")},
             "description": { type: 'string',  validatorGetter: (paramPropertyName='description')=> body(paramPropertyName).isString().withMessage("Description d'elements de reparations invalides")},
             "price": { type: 'string',  validatorGetter: (paramPropertyName='price')=> body(paramPropertyName).isFloat().withMessage("Prix d'elements de reparations invalide").toFloat()},
+            "progression": { type: 'string',  validatorGetter: (paramPropertyName='progression')=> body(paramPropertyName).isInt().withMessage("Progression invalide").toInt()},
         }
     static createSchemaDto = {...this.schema};
     static updateSchemaDto = {...this.schema};
