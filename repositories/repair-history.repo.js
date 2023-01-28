@@ -22,20 +22,20 @@ module.exports = class RepairHistoryRepository extends GenRepository {
         return [
             {
                 $addFields: {
-                    timePeriod: { $dateToString: {format: vars[groupByType].timePeriodFormat, date: "$receptionDate"} },
-                    timePeriodForFilter:  { $dateToString: {format: vars[groupByType].timePeriodFormatForFilter, date: "$receptionDate"} },
+                    timePeriod: { $dateToString: {format: vars[groupByType].timePeriodFormat, date: {$toDate: "$receptionDate"} } },
+                    timePeriodForFilter:  { $dateToString: {format: vars[groupByType].timePeriodFormatForFilter, date:  {$toDate: "$receptionDate"}} },
                     ended : "$repairs.ended"
                 }
             },
             {
-                $match: { timePeriodForFilter: {$eq: formatAndTrunc(groupByValueLimit, groupByType)}, $and: [{currentRepair: {$exists: true}}, {currentRepair: {$ne: null}}]}
+                $match: { timePeriodForFilter: {$eq: formatAndTrunc(groupByValueLimit, groupByType)}}
             },
            
         ]
     } 
     async findHistoryCaRepair(groupByValueLimit, groupByType){
         const collection = this.getCollection();
-        const results =   await collection.aggregate([
+        const aggregateArr = [
             ...this.generateBaseAggrForGroup(groupByValueLimit,groupByType),
             {
                 $unwind: "$ended"
@@ -46,7 +46,9 @@ module.exports = class RepairHistoryRepository extends GenRepository {
                     "amount": {$sum: "$ended.price" }
                 }
             }
-        ]).toArray();
+        ]
+        console.log(JSON.stringify(aggregateArr));
+        const results =   await collection.aggregate(aggregateArr).toArray();
         const ans = {};
         results.map(elmt => ans[elmt._id] = elmt)
         return ans;

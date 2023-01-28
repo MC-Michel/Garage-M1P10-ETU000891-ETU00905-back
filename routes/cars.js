@@ -108,6 +108,7 @@ const generateExitSlip = async function(req, res) {
   console.log(car)
   let repairHistoric = car.currentRepair;
   repairHistoric.carId = ObjectId(car._id);
+  repairHistoric.exitInitDate = new Date();
   const updatedStatusCar = assign(Car, req.body, 'exitGenerationDto');
   updatedStatusCar.currentRepair = null;
   await repairHistoricRepository.insert([repairHistoric]);
