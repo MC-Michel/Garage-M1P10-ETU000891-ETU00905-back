@@ -5,6 +5,7 @@ const { getConnection } = require('../configs/db');
 const createBodySchemaParser = require('../middlewares/body-schema-parser');
 const Expenses = require('../models/expenses.model');
 const {assign} = require('../commons/database/methods/gen-reflect')
+const createAuth = require('../middlewares/auth');
 var router = express.Router();
 
 const expensesRepository = new GenRepository(Expenses);
@@ -26,9 +27,9 @@ const deleteExpenses = async function (req, res) {
   await expensesRepository.delete(req.params.id);
   res.json({message: "Expenses deleted"});
 }
-router.get('', createRouteCallback(getList));
-router.post('', createRouteCallback(insertExpenses));
-router.delete('/:id', createRouteCallback(deleteExpenses));
-router.patch('', createRouteCallback(updateExpenses));
+router.get('',createAuth([3]), createRouteCallback(getList));
+router.post('',createAuth([3]),createBodySchemaParser(Expenses), createRouteCallback(insertExpenses));
+router.delete('/:id',createAuth([3]), createRouteCallback(deleteExpenses));
+router.patch('',createAuth([3]),createBodySchemaParser(Expenses, 'updateSchemaDto'), createRouteCallback(updateExpenses));
 
 module.exports = router;
