@@ -9,6 +9,7 @@ class Repair {
     static createSchemaDto = {...this.schema};
     static updateSchemaDto = {...this.schema};
     static repairUpdateDto = {...this.schema}; 
+    static paymentValidationDto= { "status": this.schema.status};
     static collection = "Repair";
 }
 

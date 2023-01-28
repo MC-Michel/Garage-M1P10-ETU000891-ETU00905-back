@@ -31,6 +31,8 @@ class Car {
         return ans;}) ();
     static depositDto = { _id }; 
     static repairUpdateDto = {  "currentRepair": { classConstructor: Repair}, _id } 
+    static paymentValidationDto =  {  "currentRepair": { classConstructor: Repair}, _id } 
+    static exitGenerationDto = {"status": this.schema.status, _id}
     static collection = "Car";
 }
 

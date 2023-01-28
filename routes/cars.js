@@ -12,6 +12,7 @@ const CarService = require('../services/car.service');
 const CustomError = require('../errors/custom-error');
 const createAuth = require('../middlewares/auth');
 const CarRepository = require('../repositories/car.repo');
+const { findCoreCarById } = require('../services/car.service');
 var router = express.Router();
 
 const carRepository = new CarRepository();
@@ -50,9 +51,12 @@ const updateCar = async function(req, res) {
   res.json({message: "Car updated"});
 }
 const updateCarRepairsProgression = async function(req, res) {
-  await carRepository.update(req.body);
+  const car = await CarService.findCoreCarById(req.body._id, {exists: true});  
+  const body = assign(Car, req.body, 'repairUpdateDto');
+  await carRepository.update(body);
   res.json({message: "Car updated"});
 }
+
 const deleteCarCustomer = async function (req, res) {
   const car = await CarService.findCoreCarById(req.params.id, {currentUser: req.currentUser, exists: true});
   await carRepository.softDelete(req.params.id);
@@ -71,27 +75,33 @@ const getById = async function (req, res){
   res.json(car);
 }
 const addCurrentRepair = async function(req, res) {
-  await carRepository.update(req.body);
+  const car = findCoreCarById(req.body._id,  {exists: true})
+  const body = assign(Car, req.body, 'repairUpdateDto');
+  await carRepository.update(body);
   res.json({message: "Car updated"});
 }
 const getCurrentRepairToValid = async function(req, res) {  
-  req.query.filter = [
+  if(!req.query.filter)req.query.filter = [];
+  req.query.filter.concat( [
     {column: 'currentRepair' , value:true, comparator: 'exists'},
     {column: 'currentRepair.status' , value:Constant.status.created, comparator: '='},
-  ];
-  const data = await carRepository.find(req.query);
+  ]);
+  const data = await CarService.findCoreCars(req.query);
   res.json(data);
 };
 const validPaiement = async function(req, res) {
-  await carRepository.update(req.body);
+  const car =  await CarService.findCoreCarById(req.body._id, { exists: true});
+  const body = assign(Car, req.body, 'paymentValidationDto')
+  await carRepository.update(body);
   res.json({message: "Car updated"});
 }
-const generateExitSlip = async function(req, res) {
-  let car = req.body;
+const generateExitSlip = async function(req, res) { 
+  const car =  await CarService.findCoreCarById( req.body._id, { exists: true});
   let repairHistoric = car.currentRepair;
   repairHistoric.carId = ObjectId(car._id);
+  const updatedStatusCar = assign(Car, req.body, 'exitGenerationDto');
   await repairHistoricRepository.insert([repairHistoric]);
-  await carRepository.update(car);
+  await carRepository.update(updatedStatusCar);
   res.json({message: "Car updated"});
 }
 const getCurrentRepairByCarAtelier = async function(req, res) {  
@@ -102,6 +112,7 @@ const getCurrentRepairByCarAtelier = async function(req, res) {
   res.json(data);
 };
 const getCurrentRepairByCarClient = async function(req, res) {  
+  const car = await CarService.findCoreCarById( req.query.id, {currentUser: req.currentUser, exists: true});
   req.query.filter = [
     {column: '_id' , value:ObjectID(req.query.id), comparator: '='}
   ];
@@ -109,10 +120,11 @@ const getCurrentRepairByCarClient = async function(req, res) {
   res.json(data);
 };
 const getRepairsAtelier = async function(req, res) {  
-  req.query.filter = [
+  if(!req.query.filter)req.query.filter = [];
+  req.query.filter.concat( [
     {column: 'currentRepair' , value:true, comparator: 'exists'},
     {column: 'currentRepair.status' , value:Constant.status.validated, comparator: '='},
-  ];
+  ]);
   const data = await carRepository.find(req.query);
   res.json(data);
 };
@@ -127,23 +139,17 @@ router.get('/customer/:id', createAuth([1]), createRouteCallback(getById));
 router.patch('/deposit', createAuth([1]),createBodySchemaParser(Car, 'depositDto'), createRouteCallback(depositCar));
 
 
+//Admins endpoints
+router.get('/admin', createAuth([2,3]), createRouteCallback(getListForAdmin));
+router.patch('/add_current_repair', createAuth([2]),createBodySchemaParser(Car, 'repairUpdateDto'), createRouteCallback(addCurrentRepair));
+router.patch('/repairs_progression',createAuth([2]),createBodySchemaParser(Car, 'repairUpdateDto'), createRouteCallback(updateCarRepairsProgression));
+router.get('/current_repair_to_valid',createAuth([2]), createRouteCallback(getCurrentRepairToValid));
+router.patch('/valid_paiement',createAuth([3]), createRouteCallback(validPaiement));
+router.patch('/exit_slip',createAuth([2]), createRouteCallback(generateExitSlip));
 
-router.get('/to-receive', createRouteCallback(getListForAdmin));
-
-
-
-
-
-
-router.patch('/add_current_repair',createBodySchemaParser(Car, 'repairUpdateDto'), createRouteCallback(addCurrentRepair));
-
-router.patch('/repairs_progression', createRouteCallback(updateCarRepairsProgression));
-router.get('/current_repair_to_valid', createRouteCallback(getCurrentRepairToValid));
-router.patch('/valid_paiement', createRouteCallback(validPaiement));
-router.patch('/exit_slip', createRouteCallback(generateExitSlip));
-router.get('/atelier/current_repair', createRouteCallback(getCurrentRepairByCarAtelier));
-router.get('/client/current_repair', createRouteCallback(getCurrentRepairByCarClient));
-router.get('/atelier/repair', createRouteCallback(getRepairsAtelier));
+router.get('/atelier/current_repair',createAuth([2]), createRouteCallback(getCurrentRepairByCarAtelier));
+router.get('/customer/current_repair',createAuth([1]), createRouteCallback(getCurrentRepairByCarClient));
+router.get('/atelier/repair',createAuth([2]), createRouteCallback(getRepairsAtelier));
 
 
 module.exports = router;
