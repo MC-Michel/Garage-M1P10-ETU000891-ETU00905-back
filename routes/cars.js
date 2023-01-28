@@ -103,7 +103,9 @@ const validPaiement = async function(req, res) {
   res.json({message: "Car updated"});
 }
 const generateExitSlip = async function(req, res) { 
-  const car =  await CarService.findCoreCarById( req.body._id, { exists: true});
+  const car =  await carRepository.findById( req.body._id);
+  if(car == null) throw new CustomError('La voiture n\'existe pas: '+req.body._id);
+  console.log(car)
   let repairHistoric = car.currentRepair;
   repairHistoric.carId = ObjectId(car._id);
   const updatedStatusCar = assign(Car, req.body, 'exitGenerationDto');
@@ -155,7 +157,7 @@ router.patch('/repairs_progression',createAuth([2]),createBodySchemaParser(Car, 
 router.patch('/valid_paiement',createAuth([3]), createRouteCallback(validPaiement));
 router.patch('/exit_slip',createAuth([2]), createRouteCallback(generateExitSlip));
 
-router.get('/atelier/current_repair',createAuth([2]), createRouteCallback(getCurrentRepairByCarAtelier));
+router.get('/admin/current_repair',createAuth([2, 3]), createRouteCallback(getCurrentRepairByCarAtelier));
 router.get('/customer/current_repair',createAuth([1]), createRouteCallback(getCurrentRepairByCarClient));
 router.get('/atelier/repair',createAuth([2]), createRouteCallback(getRepairsAtelier));
 
