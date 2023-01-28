@@ -104,6 +104,7 @@ const generateExitSlip = async function(req, res) {
   let repairHistoric = car.currentRepair;
   repairHistoric.carId = ObjectId(car._id);
   const updatedStatusCar = assign(Car, req.body, 'exitGenerationDto');
+  updatedStatusCar.currentRepair = null;
   await repairHistoricRepository.insert([repairHistoric]);
   await carRepository.update(updatedStatusCar);
   res.json({message: "Car updated"});
@@ -125,7 +126,7 @@ const getCurrentRepairByCarClient = async function(req, res) {
 };
 const getRepairsAtelier = async function(req, res) {  
   if(!req.query.filter)req.query.filter = [];
-  req.query.filter.concat( [
+  req.query.filter = req.query.filter.concat( [
     {column: 'currentRepair' , value:true, comparator: 'exists'},
     {column: 'currentRepair.status' , value:Constant.status.validated, comparator: '='},
   ]);

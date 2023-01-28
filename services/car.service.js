@@ -18,7 +18,7 @@ module.exports = class CarService {
         if(result.data.length === 0) 
             if(options.exists) throw new CustomError('Aucune voiture correspondante')    
             else return null;
-        if(options.currentUser && options.currentUser._id != result.data[0].userId ) 
+        if(options.currentUser && !options.currentUser._id.equals(result.data[0].userId )) 
             throw new CustomError(`La voiture ${result.data[0].numberPlate} n'appartient pas a l'utilisateur actuel`);
         if(!options.alsoDeleted && result.data[0].deletedAt)
             throw new CustomError('La voiture a déjà ete supprimée');
