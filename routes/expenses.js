@@ -16,11 +16,13 @@ const getList = async function(req, res) {
 };
 
 const insertExpenses = async function(req, res) {
-  await expensesRepository.insert([req.body]);
+  const body = assign(Expenses,req.body)
+  await expensesRepository.insert([body]);
   res.json({message: "Expenses created"});
 }
 const updateExpenses = async function(req, res) {
-  await expensesRepository.update(req.body);
+  const body = assign(Expenses,req.body, 'updateSchemaDto')
+  await expensesRepository.update(body);
   res.json({message: "Expenses updated"});
 }
 const deleteExpenses = async function (req, res) {

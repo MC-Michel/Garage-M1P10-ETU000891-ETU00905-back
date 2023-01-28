@@ -8,6 +8,7 @@ const {assign} = require('../commons/database/methods/gen-reflect');
 const PdfService = require('../services/pdf.service');
 const { query } = require('express-validator');
 var router = express.Router();
+const createAuth = require('../middlewares/auth');
 
 const repairRepository = new GenRepository(Repair);
 
@@ -42,7 +43,7 @@ const createInvoice = async function (req, res){
 // router.post('', createRouteCallback(insertRepair));
 // router.delete('/:id', createRouteCallback(deleteRepair));
 // router.patch('', createRouteCallback(updateRepair));
-router.get('/invoice/:repairId', createRouteCallback(createInvoice))
+router.get('/invoice/:repairId',createAuth([]), createRouteCallback(createInvoice))
 
 // Financier
 // router.get('/valid', createRouteCallback(getList));

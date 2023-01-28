@@ -39,15 +39,17 @@ const getListForAdmin = async function(req, res) {
 };
 
 const insertCar = async function(req, res) {
-  req.body.status = Constant.carStatus.inCirculation;
-  req.body.registrationDate = new Date();
-  req.body.userId = req.currentUser._id;
-  await carRepository.insert([req.body]);
+  const body = assign(Car, req.body, 'createSchemaDto');
+  body.status = Constant.carStatus.inCirculation;
+  body.registrationDate = new Date();
+  body.userId = req.currentUser._id;
+  await carRepository.insert([body]);
   res.json({message: "Car created"});
 }
 const updateCar = async function(req, res) {
   const car = await CarService.findCoreCarById(req.body._id, {currentUser: req.currentUser, exists: true});
-  await carRepository.update(req.body);
+  const body = assign(Car, req.body, 'updateSchemaDto');
+  await carRepository.update(body);
   res.json({message: "Car updated"});
 }
 const updateCarRepairsProgression = async function(req, res) {
@@ -63,9 +65,11 @@ const deleteCarCustomer = async function (req, res) {
   res.json({message: "Voiture retirée"});
 }
 const depositCar = async function(req, res) { 
-  req.body.status = Constant.carStatus.deposited;
+ 
   const car = await CarService.findCoreCarById(req.body._id, {currentUser: req.currentUser, exists: true});
-  await carRepository.update(req.body);
+  const body = assign(Car,req.body, 'depositDto' );
+  body.status = Constant.carStatus.deposited;
+  await carRepository.update(body);
   res.json({message: "Voiture deposee en attente de validation"});
 }
 

@@ -2,8 +2,8 @@ var express = require('express');
 const GenRepository = require('../commons/database/class/gen-repository');
 const createRouteCallback = require('../commons/functions/create-route-callback');
 const RepairHistoric = require('../models/repair-historic.model');
-var router = express.Router();
-
+var router = express.Router(); 
+const createAuth = require('../middlewares/auth');
 const repairHistoricRepository = new GenRepository(RepairHistoric);  
 
 const getListForCustomer = async function(req, res) {  
@@ -22,7 +22,7 @@ const getListForAdmin = async function(req, res) {
 };
 
 
-router.get('/:carId/customer', createRouteCallback(getListForCustomer));
-router.get('/admin', createRouteCallback(getListForAdmin));
+router.get('/customer/:carId',createAuth([1]), createRouteCallback(getListForCustomer));
+router.get('/admin',createAuth([2,3]), createRouteCallback(getListForAdmin));
 
 module.exports = router;

@@ -5,7 +5,8 @@ const createBodySchemaParser = require('../middlewares/body-schema-parser');
 const DefaultRepair = require('../models/default-repairs.model');
 var router = express.Router();
 
-const createAuth = require('../middlewares/auth');
+const createAuth = require('../middlewares/auth'); 
+const { assign } = require('../commons/database/methods/gen-reflect');
 
 const repository = new GenRepository(DefaultRepair);
 
@@ -31,13 +32,15 @@ const getByIdAdmin = async function (req, res){
 }
 
 const insert = async function(req, res) {
-  req.body.status = 0;
-  req.body.registrationDate = new Date();
-  await repository.insert([req.body]);
+  const body = assign(DefaultRepair, req.body);
+  body.status = 0;
+  body.registrationDate = new Date();
+  await repository.insert([body]);
   res.json({message: "Default repair created"});
 }
 const update = async function(req, res) {
-  await repository.update(req.body);
+  const body = assign(DefaultRepair, req.body, 'updateSchemaDto');
+  await repository.update(body);
   res.json({message: "Default repair updated"});
 }
 const deleteDefaultRepair = async function (req, res) {
