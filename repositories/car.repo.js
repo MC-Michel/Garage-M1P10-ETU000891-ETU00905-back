@@ -1,3 +1,7 @@
+ 
+ 
+ 
+const { ObjectID } = require("bson");
 const GenRepository = require("../commons/database/class/gen-repository");
 const { formatAndTrunc } = require("../commons/functions/gen-date");
 const { getConnection } = require("../configs/db");
@@ -17,11 +21,14 @@ module.exports = class CarRepository extends GenRepository {
         super(Car);
     }
     async findCurrentRepair(repairId){
-        const filter = {
-            'currentRepair._id': repairId
-        };
+        const filter = [{
+            column:'currentRepair._id',
+            value: repairId,
+            comparator: '='
+        }];
         const result = await this.find({filter});
         if(result.data.length == 0) return null;
+        result.data[0].currentRepair.carId = result.data[0]._id;
         return result.data[0].currentRepair;
 
     }

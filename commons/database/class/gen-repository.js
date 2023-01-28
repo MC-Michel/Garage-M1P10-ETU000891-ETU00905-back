@@ -58,7 +58,7 @@ class GenRepository {
       
       
         const filters = this.createMatchOptions(params.filter, params.filterMode)
-        
+        console.log(filters)
         const collection = this.getCollection();
         const results = await collection.find(filters,queryOptions).project(projection).toArray();
          

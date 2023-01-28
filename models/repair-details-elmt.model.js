@@ -9,6 +9,7 @@ class RepairDetailsElmt {
     static createSchemaDto = {...this.schema};
     static updateSchemaDto = {...this.schema};
     static repairUpdateDto = {...this.schema}; 
+    static repairAddCurrentDto = {...this.schema};
 }
 
 module.exports = RepairDetailsElmt;

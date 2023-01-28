@@ -33,7 +33,7 @@ module.exports = class PdfService {
             });
         })
     }
-    static async mapTemplateData(templateContent, data){
+    static mapTemplateData(templateContent, data){
         data = flattenObject(data);
         for(let key in data){
             templateContent = templateContent.replaceAll(`{{${key}}}`, data[key]);
@@ -51,26 +51,29 @@ module.exports = class PdfService {
                     <td>${elmt.description}</td>
                     <td>Ar ${elmt.price}</td> 
                 </tr>
-            `
+            `;
+            total += elmt.price
         })
         let tvaRate = +getEnv('TVA_RATE');
+
         let tva = tvaRate * total/100;
         let ttc = tva+total;
-        return {html,tvaRate, tva, ttc};
+        return {html,tvaRate, tva, ttc, total};
     }
     static async generateInvoice(repairId){
-        let repair = repairHistoryRepository.findById(repairId);
-        if(repair == null) repair = carRepository.findCurrentRepair(repairId);
+        let repair = await repairHistoryRepository.findById(repairId);
+        if(repair == null) repair = await  carRepository.findCurrentRepair(repairId);
         if (repair == null) throw new CustomError(`Aucune reparation correspondant a l'id ${repairId}`);
-        let car = carRepository.findById(repair.carId);
-        let user = userRepository.findById(car.userId);
+        let car = await carRepository.findById(repair.carId);
+        let user = await userRepository.findById(car.userId);
+   
         repair.receptionDate = formatAndTrunc(repair.receptionDate);
-
+       
         let fileContent = await PdfService.readFile(invoiceTemplatePath);
         fileContent = this.mapTemplateData(fileContent, {
             repair, car, user,
             reparationElmtsDada: PdfService.generateReparationElmtsData(repair.repairs.ended)
-        });
+        }); 
         let stream = await PdfService.createPdf(fileContent);
 
         return stream;

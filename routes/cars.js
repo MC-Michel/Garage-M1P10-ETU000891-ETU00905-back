@@ -13,6 +13,7 @@ const CustomError = require('../errors/custom-error');
 const createAuth = require('../middlewares/auth');
 const CarRepository = require('../repositories/car.repo');
 const { findCoreCarById } = require('../services/car.service');
+const { carStatus } = require('../models/constant.model');
 var router = express.Router();
 
 const carRepository = new CarRepository();
@@ -80,7 +81,9 @@ const getById = async function (req, res){
 }
 const addCurrentRepair = async function(req, res) {
   const car = findCoreCarById(req.body._id,  {exists: true})
+
   const body = assign(Car, req.body, 'repairUpdateDto');
+  body.status = carStatus.inReparation;
   await carRepository.update(body);
   res.json({message: "Car updated"});
 }
@@ -128,7 +131,7 @@ const getRepairsAtelier = async function(req, res) {
   if(!req.query.filter)req.query.filter = [];
   req.query.filter = req.query.filter.concat( [
     {column: 'currentRepair' , value:true, comparator: 'exists'},
-    {column: 'currentRepair.status' , value:Constant.status.validated, comparator: '='},
+    {column: 'status' , value:Constant.carStatus.inReparation, comparator: '='},
   ]);
   const data = await carRepository.find(req.query);
   res.json(data);
@@ -146,9 +149,9 @@ router.patch('/deposit', createAuth([1]),createBodySchemaParser(Car, 'depositDto
 
 //Admins endpoints
 router.get('/admin', createAuth([2,3]), createRouteCallback(getListForAdmin));
-router.patch('/add_current_repair', createAuth([2]),createBodySchemaParser(Car, 'repairUpdateDto'), createRouteCallback(addCurrentRepair));
+router.patch('/add_current_repair', createAuth([2]),createBodySchemaParser(Car, 'repairAddCurrentDto'), createRouteCallback(addCurrentRepair));
 router.patch('/repairs_progression',createAuth([2]),createBodySchemaParser(Car, 'repairUpdateDto'), createRouteCallback(updateCarRepairsProgression));
-router.get('/current_repair_to_valid',createAuth([2]), createRouteCallback(getCurrentRepairToValid));
+//router.get('/current_repair_to_valid',createAuth([2]), createRouteCallback(getCurrentRepairToValid));
 router.patch('/valid_paiement',createAuth([3]), createRouteCallback(validPaiement));
 router.patch('/exit_slip',createAuth([2]), createRouteCallback(generateExitSlip));
 
