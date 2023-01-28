@@ -5,6 +5,8 @@ const createBodySchemaParser = require('../middlewares/body-schema-parser');
 const DefaultRepair = require('../models/default-repairs.model');
 var router = express.Router();
 
+const createAuth = require('../middlewares/auth');
+
 const repository = new GenRepository(DefaultRepair);
 
 const getListForCustomer = async function(req, res) {  
@@ -43,14 +45,14 @@ const deleteDefaultRepair = async function (req, res) {
   res.json({message: "Default repair deleted"});
 }
 
-router.delete('/:id', createRouteCallback(deleteDefaultRepair));
-router.patch('',createBodySchemaParser(DefaultRepair, 'updateSchemaDto'), createRouteCallback(update));
+router.delete('/:id',createAuth([2,3]), createRouteCallback(deleteDefaultRepair));
+router.patch('',createAuth([2,3]),createBodySchemaParser(DefaultRepair, 'updateSchemaDto'), createRouteCallback(update));
 
 
-router.get('/customer', createRouteCallback(getListForCustomer));
-router.get('/admin', createRouteCallback(getListForAdmin));
-router.get('/customer/:id', createRouteCallback(getById));
-router.get('/admin/:id', createRouteCallback(getByIdAdmin));
-router.post('',createBodySchemaParser(DefaultRepair), createRouteCallback(insert));
+router.get('/customer', createAuth([1]), createRouteCallback(getListForCustomer));
+router.get('/admin',createAuth([2,3]), createRouteCallback(getListForAdmin));
+router.get('/customer/:id',createAuth([1]), createRouteCallback(getById));
+router.get('/admin/:id',createAuth([2,3]), createRouteCallback(getByIdAdmin));
+router.post('',createAuth([2,3]),createBodySchemaParser(DefaultRepair), createRouteCallback(insert));
 
 module.exports = router;
