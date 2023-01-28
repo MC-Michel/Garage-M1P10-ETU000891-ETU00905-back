@@ -1,11 +1,12 @@
 const { ObjectID } = require("bson");
 const GenRepository = require("../commons/database/class/gen-repository");
+const CustomError = require("../errors/custom-error");
 const Car = require("../models/car.model");
 
  
 const carRepository = new GenRepository(Car) 
 module.exports = class CarService {
-    static async findCoreCarById(_id){
+    static async findCoreCarById(_id, options = {}){
         const filter = [{
             column: '_id',
             type: 'string',
@@ -14,7 +15,13 @@ module.exports = class CarService {
         }];
         const excludeFields = ['currentRepair'];
         const result = await carRepository.find({filter, excludeFields});
-        if(result.data.length === 0) return null;
+        if(result.data.length === 0) 
+            if(options.exists) throw new CustomError('Aucune voiture correspondante')    
+            else return null;
+        if(options.currentUser && options.currentUser._id != result.data[0].userId ) 
+            throw new CustomError(`La voiture ${result.data[0].numberPlate} n'appartient pas a l'utilisateur actuel`);
+        if(!options.alsoDeleted && result.data[0].deletedAt)
+            throw new CustomError('La voiture a déjà ete supprimée');
         return result.data[0];
     }
 
@@ -32,6 +39,7 @@ module.exports = class CarService {
         return result;
     }
 
+    
     
 }
 

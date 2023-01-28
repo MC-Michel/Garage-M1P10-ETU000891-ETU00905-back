@@ -11,10 +11,14 @@ const Constant = require('../models/constant.model');
 const CarService = require('../services/car.service');
 const CustomError = require('../errors/custom-error');
 const createAuth = require('../middlewares/auth');
+const CarRepository = require('../repositories/car.repo');
 var router = express.Router();
 
-const carRepository = new GenRepository(Car);
+const carRepository = new CarRepository();
 const repairHistoricRepository = new GenRepository(RepairHistoric);  
+
+
+
 
 const getListForCustomer = async function(req, res) {  
   const params = req.query;
@@ -41,6 +45,7 @@ const insertCar = async function(req, res) {
   res.json({message: "Car created"});
 }
 const updateCar = async function(req, res) {
+  const car = await CarService.findCoreCarById(req.body._id, {currentUser: req.currentUser, exists: true});
   await carRepository.update(req.body);
   res.json({message: "Car updated"});
 }
@@ -49,26 +54,20 @@ const updateCarRepairsProgression = async function(req, res) {
   res.json({message: "Car updated"});
 }
 const deleteCarCustomer = async function (req, res) {
-  const car = await CarService.findCoreCarById(req.params.id);
-  if(!car) throw new CustomError('Aucune voiture correspondante');
-  if(car.deletedAt) throw new CustomError('La voiture a déjà ete supprimée');
-  if(!car.userId.equals(req.currentUser._id)) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'utilisateur actuel`);
+  const car = await CarService.findCoreCarById(req.params.id, {currentUser: req.currentUser, exists: true});
   await carRepository.softDelete(req.params.id);
   res.json({message: "Voiture retirée"});
 }
 const depositCar = async function(req, res) { 
   req.body.status = Constant.carStatus.deposited;
-  const car = await CarService.findCoreCarById(req.body._id);
- 
-  if(car.status != 0) throw new CustomError(`La voiture ${car.numberPlate} n'est pas en circulation`);
-  if(!car.userId.equals(req.currentUser._id)) throw new CustomError(`La voiture ${car.numberPlate} n'appartient pas a l'utilisateur actuel`);
+  const car = await CarService.findCoreCarById(req.body._id, {currentUser: req.currentUser, exists: true});
   await carRepository.update(req.body);
   res.json({message: "Voiture deposee en attente de validation"});
 }
 
 const getById = async function (req, res){
-  const car = await CarService.findCoreCarById(req.params.id);
-  if(car == null) throw new CustomError(`Aucune voiture correspondante a l'id ${req.params.id}`);
+  const car = await CarService.findCoreCarById(req.params.id, {currentUser: req.currentUser, exists: true});
+ 
   res.json(car);
 }
 const addCurrentRepair = async function(req, res) {
@@ -118,25 +117,24 @@ const getRepairsAtelier = async function(req, res) {
   res.json(data);
 };
 
-const testBodyParser = async function (req, res){
-  
-  console.log(req.body);
-  console.log(assign(Car, req.body));
-  res.json({message: "Done"});
-}
 
-router.delete('/customer/:id', createAuth(), createRouteCallback(deleteCarCustomer));
-router.patch('',createBodySchemaParser(Car, 'updateSchemaDto'), createRouteCallback(updateCar));
+//Customer endpoints
+router.delete('/customer/:id', createAuth([1]), createRouteCallback(deleteCarCustomer));
+router.patch('/customer',createAuth([1]),createBodySchemaParser(Car, 'updateSchemaDto'), createRouteCallback(updateCar));
+router.get('/customer', createAuth([1]), createRouteCallback(getListForCustomer));
+router.post('', createAuth([1]), createBodySchemaParser(Car), createRouteCallback(insertCar));
+router.get('/customer/:id', createAuth([1]), createRouteCallback(getById));
+router.patch('/deposit', createAuth([1]),createBodySchemaParser(Car, 'depositDto'), createRouteCallback(depositCar));
 
 
-router.get('/customer', createAuth(), createRouteCallback(getListForCustomer));
+
 router.get('/to-receive', createRouteCallback(getListForAdmin));
-router.get('/customer/:id', createRouteCallback(getById));
-router.post('', createAuth(), createBodySchemaParser(Car), createRouteCallback(insertCar));
 
 
 
-router.patch('/deposit', createAuth(),createBodySchemaParser(Car, 'depositDto'), createRouteCallback(depositCar));
+
+
+
 router.patch('/add_current_repair',createBodySchemaParser(Car, 'repairUpdateDto'), createRouteCallback(addCurrentRepair));
 
 router.patch('/repairs_progression', createRouteCallback(updateCarRepairsProgression));
@@ -147,6 +145,5 @@ router.get('/atelier/current_repair', createRouteCallback(getCurrentRepairByCarA
 router.get('/client/current_repair', createRouteCallback(getCurrentRepairByCarClient));
 router.get('/atelier/repair', createRouteCallback(getRepairsAtelier));
 
-router.post('/test-body-parser',createBodySchemaParser(Car), createRouteCallback(testBodyParser));
 
 module.exports = router;
