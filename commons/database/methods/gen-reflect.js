@@ -8,6 +8,7 @@ function assign(targetClass, obj, schemaName='schema'){
     if(!isArray) obj = [obj];
    const newInstances = []
     obj.forEach(element => {
+        
         const newInstance = {};
         Object.keys(targetClass[schemaName]).map(key=>{ 
             if(targetClass[schemaName][key].classConstructor){

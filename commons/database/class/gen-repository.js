@@ -16,7 +16,8 @@ class GenRepository {
      * @returns any
      */
     async insert(entities, schemaName='schema'){
-        const toInsert  = entities.map(elmt=> assign(this.entityClass, elmt, schemaName));
+        //const toInsert  = entities.map(elmt=> assign(this.entityClass, elmt, schemaName));
+        const toInsert = entities;
         const collection = getConnection().collection(this.entityClass.collection);
         return await collection.insertMany(toInsert);
     }
