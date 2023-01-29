@@ -73,6 +73,14 @@ const depositCar = async function(req, res) {
   await carRepository.update(body);
   res.json({message: "Voiture deposee en attente de validation"});
 }
+const exitCar = async function(req, res) { 
+  const car = await CarService.findCoreCarById(req.body._id, {currentUser: req.currentUser, exists: true});
+  if(car.currentRepair || car.status != Constant.carStatus.waitExit) throw new CustomError('La voiture ne peut pas encore etre retirée');
+  const body = assign(Car,req.body, 'exitDto' );
+  body.status = Constant.carStatus.inCirculation;
+  await carRepository.update(body);
+  res.json({message: "Voiture retiree"});
+}
 
 const getById = async function (req, res){
   const car = await CarService.findCoreCarById(req.params.id, {currentUser: req.currentUser, exists: true});
@@ -149,6 +157,7 @@ router.post('', createAuth([1]), createBodySchemaParser(Car), createRouteCallbac
 router.get('/customer/current_repair',createAuth([1]), createRouteCallback(getCurrentRepairByCarClient));
 router.get('/customer/:id', createAuth([1]), createRouteCallback(getById));
 router.patch('/deposit', createAuth([1]),createBodySchemaParser(Car, 'depositDto'), createRouteCallback(depositCar));
+router.patch('/exit', createAuth([1]),createBodySchemaParser(Car, 'exitDto'), createRouteCallback(exitCar));
 
 
 //Admins endpoints

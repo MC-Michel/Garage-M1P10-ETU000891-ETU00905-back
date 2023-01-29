@@ -9,7 +9,8 @@ class Constant {
     static carStatus = {
         inCirculation : 0, 
         deposited : 1,
-        inReparation: 2
+        inReparation: 2,
+        waitExit : 3,
     };
     static repairStatus = {
         todo : 0,

@@ -31,6 +31,7 @@ class Car {
         delete ans.registrationDate;
         return ans;}) ();
     static depositDto = { _id }; 
+    static exitDto = { _id }; 
     static repairAddCurrentDto = { "currentRepair": { classConstructor: Repair}};
     static repairUpdateDto = { "currentRepair": { classConstructor: Repair}, _id } 
     static paymentValidationDto =  {  "currentRepair": { classConstructor: Repair}, _id } 
