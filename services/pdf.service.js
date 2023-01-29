@@ -70,9 +70,13 @@ module.exports = class PdfService {
         repair.receptionDate = formatAndTrunc(repair.receptionDate);
        
         let fileContent = await PdfService.readFile(invoiceTemplatePath);
+        let allRepairs = []
+        if(repair.repairs.todo)allRepairs = allRepairs.concat(repair.repairs.todo)
+        if(repair.repairs.inprogress)allRepairs= allRepairs.concat(repair.repairs.inprogress)
+        if(repair.repairs.ended)allRepairs= allRepairs.concat(repair.repairs.ended)
         fileContent = this.mapTemplateData(fileContent, {
             repair, car, user,
-            reparationElmtsDada: PdfService.generateReparationElmtsData(repair.repairs.ended)
+            reparationElmtsDada: PdfService.generateReparationElmtsData(allRepairs)
         }); 
         let stream = await PdfService.createPdf(fileContent);
 

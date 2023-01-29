@@ -7,13 +7,15 @@ const UserService = require('../services/user.service');
 module.exports = function createAuth(allowedRoles=[]){
     const tokenCheck = header('token').isString().withMessage(noAuthenticationMessage);
     const authentication = async function (req, res, next){
+      
         try{
             const token = req.headers.token;
             const user = await UserService.findUserByValidToken(token);
             if(!user)throw new CustomError ("Session expire");
-            req.currentUser = user;
+            req.currentUser = user; 
             next();
         }catch(e){
+           
             let message= "Une erreur s'est produite...";
             console.log(e.message);
             if(e instanceof CustomError) message = e.message;

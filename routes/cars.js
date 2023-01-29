@@ -123,6 +123,7 @@ const getCurrentRepairByCarAtelier = async function(req, res) {
   res.json(data);
 };
 const getCurrentRepairByCarClient = async function(req, res) {  
+  
   const car = await CarService.findCoreCarById( req.query.id, {currentUser: req.currentUser, exists: true});
   req.query.filter = [
     {column: '_id' , value:ObjectID(req.query.id), comparator: '='}
@@ -146,6 +147,7 @@ router.delete('/customer/:id', createAuth([1]), createRouteCallback(deleteCarCus
 router.patch('/customer',createAuth([1]),createBodySchemaParser(Car, 'updateSchemaDto'), createRouteCallback(updateCar));
 router.get('/customer', createAuth([1]), createRouteCallback(getListForCustomer));
 router.post('', createAuth([1]), createBodySchemaParser(Car), createRouteCallback(insertCar));
+router.get('/customer/current_repair',createAuth([1]), createRouteCallback(getCurrentRepairByCarClient));
 router.get('/customer/:id', createAuth([1]), createRouteCallback(getById));
 router.patch('/deposit', createAuth([1]),createBodySchemaParser(Car, 'depositDto'), createRouteCallback(depositCar));
 
@@ -159,7 +161,7 @@ router.patch('/valid_paiement',createAuth([3]), createRouteCallback(validPaiemen
 router.patch('/exit_slip',createAuth([2]), createRouteCallback(generateExitSlip));
 
 router.get('/admin/current_repair',createAuth([2, 3]), createRouteCallback(getCurrentRepairByCarAtelier));
-router.get('/customer/current_repair',createAuth([1]), createRouteCallback(getCurrentRepairByCarClient));
+
 router.get('/atelier/repair',createAuth([2]), createRouteCallback(getRepairsAtelier));
 
 

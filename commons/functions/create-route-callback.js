@@ -15,7 +15,7 @@ function createRouteCallback(f){
           await f(req, res);
         }catch(e){
             let message= "Une erreur s'est produite...";
-            console.log(e.message);
+            console.log(e);
             if(e instanceof CustomError) message = e.message;
             res.status(e.statusCode?e.statusCode:500 ).json({message: message})
         }        

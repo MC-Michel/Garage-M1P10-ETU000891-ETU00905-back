@@ -23,7 +23,7 @@ module.exports = class CarRepository extends GenRepository {
     async findCurrentRepair(repairId){
         const filter = [{
             column:'currentRepair._id',
-            value: repairId,
+            value: ObjectID(repairId),
             comparator: '='
         }];
         const result = await this.find({filter});
