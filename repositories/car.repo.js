@@ -6,6 +6,7 @@ const GenRepository = require("../commons/database/class/gen-repository");
 const { formatAndTrunc } = require("../commons/functions/gen-date");
 const { getConnection } = require("../configs/db");
 const Car = require("../models/car.model");
+const Constant = require("../models/constant.model");
 const vars = {
     "year": {
         timePeriodFormat: "%Y-%m",
@@ -31,6 +32,10 @@ module.exports = class CarRepository extends GenRepository {
         result.data[0].currentRepair.carId = result.data[0]._id;
         return result.data[0].currentRepair;
 
+    }
+    async validatePayment(carId){
+        const collection = this.getCollection();
+        await  collection.updateOne({_id: ObjectID(carId)}, {$set: { "currentRepair.status": Constant.status.validated}});
     }
     generateBaseAggrForGroup(groupByValueLimit,groupByType){
         return [

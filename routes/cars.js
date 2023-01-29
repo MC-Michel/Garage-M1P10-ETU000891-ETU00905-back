@@ -98,17 +98,16 @@ const getCurrentRepairToValid = async function(req, res) {
 };
 const validPaiement = async function(req, res) {
   const car =  await CarService.findCoreCarById(req.body._id, { exists: true});
-  const body = assign(Car, req.body, 'paymentValidationDto')
-  await carRepository.update(body);
+  await carRepository.validatePayment(req.body._id);
   res.json({message: "Car updated"});
 }
 const generateExitSlip = async function(req, res) { 
   const car =  await carRepository.findById( req.body._id);
   if(car == null) throw new CustomError('La voiture n\'existe pas: '+req.body._id);
-  console.log(car)
+  if(car.currentRepair?.status != Constant.status.validated) throw new CustomError('Le paiement n\'a pas encore été validé');
   let repairHistoric = car.currentRepair;
   repairHistoric.carId = ObjectId(car._id);
-  repairHistoric.exitInitDate = new Date();
+  repairHistoric.exitInitDate = req.body.exitInitDate;
   const updatedStatusCar = assign(Car, req.body, 'exitGenerationDto');
   updatedStatusCar.currentRepair = null;
   await repairHistoricRepository.insert([repairHistoric]);
@@ -158,7 +157,7 @@ router.patch('/add_current_repair', createAuth([2]),createBodySchemaParser(Car, 
 router.patch('/repairs_progression',createAuth([2]),createBodySchemaParser(Car, 'repairUpdateDto'), createRouteCallback(updateCarRepairsProgression));
 //router.get('/current_repair_to_valid',createAuth([2]), createRouteCallback(getCurrentRepairToValid));
 router.patch('/valid_paiement',createAuth([3]), createRouteCallback(validPaiement));
-router.patch('/exit_slip',createAuth([2]), createRouteCallback(generateExitSlip));
+router.patch('/exit_slip',createAuth([2]),createBodySchemaParser(Car, 'exitGenerationDto'), createRouteCallback(generateExitSlip));
 
 router.get('/admin/current_repair',createAuth([2, 3]), createRouteCallback(getCurrentRepairByCarAtelier));
 

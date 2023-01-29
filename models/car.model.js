@@ -1,4 +1,5 @@
 const {body} = require('express-validator'); 
+const RepairHistoric = require('./repair-historic.model');
 const Repair = require('./repair.model');
 
 const _id = {
@@ -33,7 +34,7 @@ class Car {
     static repairAddCurrentDto = { "currentRepair": { classConstructor: Repair}};
     static repairUpdateDto = { "currentRepair": { classConstructor: Repair}, _id } 
     static paymentValidationDto =  {  "currentRepair": { classConstructor: Repair}, _id } 
-    static exitGenerationDto = {"status": this.schema.status, _id}
+    static exitGenerationDto = {"status": this.schema.status, _id, "exitInitDate": RepairHistoric.schema.exitInitDate}
     static collection = "Car";
 }
 

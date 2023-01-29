@@ -15,8 +15,8 @@ class GenRepository {
      * @param {any[]} entities 
      * @returns any
      */
-    async insert(entities){
-        const toInsert  = entities.map(elmt=> assign(this.entityClass, elmt));
+    async insert(entities, schemaName='schema'){
+        const toInsert  = entities.map(elmt=> assign(this.entityClass, elmt, schemaName));
         const collection = getConnection().collection(this.entityClass.collection);
         return await collection.insertMany(toInsert);
     }
@@ -58,7 +58,7 @@ class GenRepository {
       
       
         const filters = this.createMatchOptions(params.filter, params.filterMode)
-        
+        console.log(JSON.stringify(filters))
         const collection = this.getCollection();
         const results = await collection.find(filters,queryOptions).project(projection).toArray();
          
@@ -120,6 +120,7 @@ class GenRepository {
             "<=": "$lte",
             ">=": "$gte",
             "exists" : "$exists",
+            "!=": '$ne'
         };
         
        const ans = filters.map(filter => {
