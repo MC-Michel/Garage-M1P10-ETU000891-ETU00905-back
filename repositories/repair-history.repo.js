@@ -68,6 +68,26 @@ module.exports = class RepairHistoryRepository extends GenRepository {
         results.map(elmt => ans[elmt._id] = elmt)
         return ans;
     }
-  
+
+    async findAvgReparationDaysCount(){
+        const collection = this.getCollection();
+        const result = await collection.aggregate([
+            {
+                $addFields: {
+                    "reparationDuration": {$subtract: [ '$exitInitDate','$receptionDate']}
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    avgReparationDuration: {$avg: "$reparationDuration"}
+                }
+            }
+        ]).toArray();
+       
+        const avgReparationDateCount = result[0].avgReparationDuration/(1000*60*60*24);
+       
+        return Math.floor(avgReparationDateCount*100)/100;
+    }
 
 }

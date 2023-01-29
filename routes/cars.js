@@ -84,7 +84,6 @@ const exitCar = async function(req, res) {
 
 const getById = async function (req, res){
   const car = await CarService.findCoreCarById(req.params.id, {currentUser: req.currentUser, exists: true});
- 
   res.json(car);
 }
 const addCurrentRepair = async function(req, res) {
