@@ -43,21 +43,24 @@ module.exports = class PdfService {
     static generateReparationElmtsData(repairElmts){
         let html = '';
         let total = 0;
-        
+        let ttc = 0;
+        let tvaRate = +getEnv('TVA_RATE');
         repairElmts.map(elmt=>{
+            const withoutTax =  elmt.price - tvaRate*elmt.price/100;
             html += `
                 <tr>
                     <td>${elmt.label}</td>
                     <td>${elmt.description}</td>
-                    <td>Ar ${elmt.price}</td> 
+                    <td>Ar ${withoutTax}</td> 
                 </tr>
             `;
-            total += elmt.price
+            total += withoutTax;
+            ttc += elmt.price;
         })
-        let tvaRate = +getEnv('TVA_RATE');
+    
 
-        let tva = tvaRate * total/100;
-        let ttc = tva+total;
+        let tva =ttc - total
+        
         return {html,tvaRate, tva, ttc, total};
     }
     static async generateInvoice(repairId){
