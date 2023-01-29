@@ -87,7 +87,7 @@ module.exports = class RepairHistoryRepository extends GenRepository {
        
         const avgReparationDateCount = result[0].avgReparationDuration/(1000*60*60*24);
        
-        return Math.floor(avgReparationDateCount*100)/100;
+        return avgReparationDateCount;
     }
 
 }
