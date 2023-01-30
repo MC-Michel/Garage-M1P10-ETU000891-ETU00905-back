@@ -73,17 +73,22 @@ module.exports = class PdfService {
     
             repair.receptionDate = formatAndTrunc(repair.receptionDate);
         
+            console.log("before readFile 76");
             let fileContent = await PdfService.readFile(invoiceTemplatePath);
             let allRepairs = []
             if(repair.repairs.todo)allRepairs = allRepairs.concat(repair.repairs.todo)
             if(repair.repairs.inprogress)allRepairs= allRepairs.concat(repair.repairs.inprogress)
+            
+            console.log("before generate element 82");
             if(repair.repairs.ended)allRepairs= allRepairs.concat(repair.repairs.ended)
             fileContent = this.mapTemplateData(fileContent, {
                 repair, car, user,
                 reparationElmtsDada: PdfService.generateReparationElmtsData(allRepairs)
             }); 
+            console.log("before create pdf 88");
             let stream = await PdfService.createPdf(fileContent);
 
+            console.log("before return 91");
             return stream;
         } catch (error) {
             console.log(error);

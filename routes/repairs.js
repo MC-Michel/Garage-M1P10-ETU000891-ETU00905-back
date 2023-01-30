@@ -33,11 +33,8 @@ const repairRepository = new GenRepository(Repair);
 const createInvoice = async function (req, res){
   const repairId = req.params.repairId;
   const invoiceStream = await PdfService.generateInvoice(repairId);
-  console.log("before facture.pdf");
   res.attachment('facture.pdf');
-  console.log("after attachment");
   invoiceStream.pipe(res);
-  console.log("after pipe");
 }
 
 
