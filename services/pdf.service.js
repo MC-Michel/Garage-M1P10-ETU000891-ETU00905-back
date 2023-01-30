@@ -26,7 +26,14 @@ module.exports = class PdfService {
     }
     static async  createPdf(fileContent){
         return new Promise((resolve, reject)=>{
-            var options = { format: 'Letter' };
+            var options = { 
+                format: 'Letter' ,
+                childProcessOptions: {
+                    env: {
+                      OPENSSL_CONF: '/dev/null',
+                    },
+                }
+            };
             pdf.create(fileContent, options).toStream(function(err, res) {
                 if (err) return reject(err);
                 resolve(res)
@@ -64,37 +71,27 @@ module.exports = class PdfService {
         return {html,tvaRate, tva, ttc, total};
     }
     static async generateInvoice(repairId){
-        try {
-            let repair = await repairHistoryRepository.findById(repairId);
-            if(repair == null) repair = await  carRepository.findCurrentRepair(repairId);
-            if (repair == null) throw new CustomError(`Aucune reparation correspondant a l'id ${repairId}`);
-            let car = await carRepository.findById(repair.carId);
-            let user = await userRepository.findById(car.userId);
+        let repair = await repairHistoryRepository.findById(repairId);
+        if(repair == null) repair = await  carRepository.findCurrentRepair(repairId);
+        if (repair == null) throw new CustomError(`Aucune reparation correspondant a l'id ${repairId}`);
+        let car = await carRepository.findById(repair.carId);
+        let user = await userRepository.findById(car.userId);
+
+        repair.receptionDate = formatAndTrunc(repair.receptionDate);
     
-            repair.receptionDate = formatAndTrunc(repair.receptionDate);
+        let fileContent = await PdfService.readFile(invoiceTemplatePath);
+        let allRepairs = []
+        if(repair.repairs.todo)allRepairs = allRepairs.concat(repair.repairs.todo)
+        if(repair.repairs.inprogress)allRepairs= allRepairs.concat(repair.repairs.inprogress)
         
-            console.log("before readFile 76");
-            let fileContent = await PdfService.readFile(invoiceTemplatePath);
-            let allRepairs = []
-            if(repair.repairs.todo)allRepairs = allRepairs.concat(repair.repairs.todo)
-            if(repair.repairs.inprogress)allRepairs= allRepairs.concat(repair.repairs.inprogress)
-            
-            console.log("before generate element 82");
-            if(repair.repairs.ended)allRepairs= allRepairs.concat(repair.repairs.ended)
-            fileContent = this.mapTemplateData(fileContent, {
-                repair, car, user,
-                reparationElmtsDada: PdfService.generateReparationElmtsData(allRepairs)
-            }); 
-            console.log("before create pdf 88");
-            let stream = await PdfService.createPdf(fileContent);
+        if(repair.repairs.ended)allRepairs= allRepairs.concat(repair.repairs.ended)
+        fileContent = this.mapTemplateData(fileContent, {
+            repair, car, user,
+            reparationElmtsDada: PdfService.generateReparationElmtsData(allRepairs)
+        }); 
+        let stream = await PdfService.createPdf(fileContent);
 
-            console.log("before return 91");
-            return stream;
-        } catch (error) {
-            console.log(error);
-            throw error;
-        }
-
+        return stream;
     }
 }
 
