@@ -1,4 +1,5 @@
 const { body } = require("express-validator");
+const md5 = require("md5");
 const Customer = require("./customer.submodel");
 
 class User {
@@ -17,7 +18,7 @@ class User {
         "password":  {
             type: 'string', 
             validatorGetter: (paramPropertyName='password')=> 
-                body(paramPropertyName).isString().withMessage("Mot de passe invalide")
+                body(paramPropertyName).isString().withMessage("Mot de passe invalide").customSanitizer(elmt => md5(elmt))
         },
         "email": {
             type: 'string', 
@@ -36,7 +37,7 @@ class User {
             "confirmPassword":  {
                 type: 'string', 
                 validatorGetter: (paramPropertyName='confirmPassword')=> 
-                    body(paramPropertyName).isString().withMessage("Confirmation de mot de passe invalide")
+                    body(paramPropertyName).isString().withMessage("Confirmation de mot de passe invalide").customSanitizer(elmt => md5(elmt))
             }
         };
         delete ans.role;

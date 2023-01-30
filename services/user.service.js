@@ -24,7 +24,7 @@ module.exports = class UserService {
                 {
                     column: 'password',
                     type: 'string',
-                    value: data.password,
+                    value: md5(data.password),
                     comparator: '='
                 },
             ]
