@@ -12,7 +12,7 @@ class Car {
             type: 'string'
         },
         "brand": { type: 'string', validatorGetter: (paramPropertyName='brand')=> body(paramPropertyName).isString().withMessage("Marque invalide")  },
-        "numberPlate": { type: 'string', validatorGetter: (paramPropertyName='numberPlate')=> body(paramPropertyName).isString().withMessage("Immatriculation invalide")  },
+        "numberPlate": { type: 'string', validatorGetter: (paramPropertyName='numberPlate')=> body(paramPropertyName).isString().withMessage("Immatriculation invalide").customSanitizer(elmt => elmt.replaceAll(' ', ''))  },
         "description": { type: 'string', validatorGetter: (paramPropertyName='description')=> body(paramPropertyName).isString().withMessage("Description invalide")  },
         "status": { type: 'int',  validatorGetter: (paramPropertyName='status')=> body(paramPropertyName).isInt().withMessage("Statut invalide").toInt() },
         "registrationDate": { type: 'date', validatorGetter: (paramPropertyName='registrationDate')=> body(paramPropertyName).isISO8601().withMessage("Date d'enregistrement invalide").toDate() },

@@ -1,5 +1,6 @@
 const { ObjectID } = require("bson");
 const { getConnection } = require("../../../configs/db"); 
+const CustomError = require("../../../errors/custom-error");
 const { assign } = require("../methods/gen-reflect");
 
 class GenRepository {
@@ -17,9 +18,16 @@ class GenRepository {
      */
     async insert(entities, schemaName='schema'){
         //const toInsert  = entities.map(elmt=> assign(this.entityClass, elmt, schemaName));
-        const toInsert = entities;
-        const collection = getConnection().collection(this.entityClass.collection);
-        return await collection.insertMany(toInsert);
+        try{
+            const toInsert = entities;
+            const collection = getConnection().collection(this.entityClass.collection);
+            return await collection.insertMany(toInsert);    
+        }catch(e){
+            let message = "Erreur lors de l'insertion";
+            console.log(e);
+            if(e.message) message = e.message;
+            throw new CustomError(message);
+        }
     }
 
     /**

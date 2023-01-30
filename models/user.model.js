@@ -22,7 +22,7 @@ class User {
         "email": {
             type: 'string', 
             validatorGetter: (paramPropertyName='email')=> 
-                body(paramPropertyName).isEmail().withMessage("Email invalide")
+                body(paramPropertyName).isEmail().withMessage("Email invalide").customSanitizer(elmt => elmt.replaceAll(' ', ''))
         },
         "roleId": {
             type: 'int'
