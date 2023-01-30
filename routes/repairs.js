@@ -37,14 +37,20 @@ const createInvoice = async function (req, res){
   invoiceStream.pipe(res);
 }
 
+const createInvoiceForCustomer = async function (req, res){
+  const repairId = req.params.repairId;
+  const invoiceStream = await PdfService.generateInvoice(repairId, req.currentUser);
+  res.attachment('facture.pdf');
+  invoiceStream.pipe(res);
+}
 
 
 // router.get('', createRouteCallback(getList));
 // router.post('', createRouteCallback(insertRepair));
 // router.delete('/:id', createRouteCallback(deleteRepair));
 // router.patch('', createRouteCallback(updateRepair));
-router.get('/invoice/:repairId',createAuth([]), createRouteCallback(createInvoice))
-
+router.get('/invoice/customer/:repairId',createAuth([1]), createRouteCallback(createInvoiceForCustomer))
+router.get('/invoice/:repairId',createAuth([2,3]), createRouteCallback(createInvoice))
 // Financier
 // router.get('/valid', createRouteCallback(getList));
 // router.patch('/valid', createRouteCallback(updateRepair));

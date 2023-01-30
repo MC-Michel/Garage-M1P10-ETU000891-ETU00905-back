@@ -70,11 +70,12 @@ module.exports = class PdfService {
         
         return {html,tvaRate, tva, ttc, total};
     }
-    static async generateInvoice(repairId){
+    static async generateInvoice(repairId, currentUser){
         let repair = await repairHistoryRepository.findById(repairId);
         if(repair == null) repair = await  carRepository.findCurrentRepair(repairId);
         if (repair == null) throw new CustomError(`Aucune reparation correspondant a l'id ${repairId}`);
         let car = await carRepository.findById(repair.carId);
+        if(currentUser && !car.userId.equals(currentUser._id)) throw new CustomError('La voiture n\'appartient pas au client actuel'); 
         let user = await userRepository.findById(car.userId);
 
         repair.receptionDate = formatAndTrunc(repair.receptionDate);
