@@ -64,27 +64,32 @@ module.exports = class PdfService {
         return {html,tvaRate, tva, ttc, total};
     }
     static async generateInvoice(repairId){
-        console.log(invoiceTemplatePath);
-        let repair = await repairHistoryRepository.findById(repairId);
-        if(repair == null) repair = await  carRepository.findCurrentRepair(repairId);
-        if (repair == null) throw new CustomError(`Aucune reparation correspondant a l'id ${repairId}`);
-        let car = await carRepository.findById(repair.carId);
-        let user = await userRepository.findById(car.userId);
-   
-        repair.receptionDate = formatAndTrunc(repair.receptionDate);
-       
-        let fileContent = await PdfService.readFile(invoiceTemplatePath);
-        let allRepairs = []
-        if(repair.repairs.todo)allRepairs = allRepairs.concat(repair.repairs.todo)
-        if(repair.repairs.inprogress)allRepairs= allRepairs.concat(repair.repairs.inprogress)
-        if(repair.repairs.ended)allRepairs= allRepairs.concat(repair.repairs.ended)
-        fileContent = this.mapTemplateData(fileContent, {
-            repair, car, user,
-            reparationElmtsDada: PdfService.generateReparationElmtsData(allRepairs)
-        }); 
-        let stream = await PdfService.createPdf(fileContent);
+        try {
+            console.log(invoiceTemplatePath);
+            let repair = await repairHistoryRepository.findById(repairId);
+            if(repair == null) repair = await  carRepository.findCurrentRepair(repairId);
+            if (repair == null) throw new CustomError(`Aucune reparation correspondant a l'id ${repairId}`);
+            let car = await carRepository.findById(repair.carId);
+            let user = await userRepository.findById(car.userId);
+    
+            repair.receptionDate = formatAndTrunc(repair.receptionDate);
+        
+            let fileContent = await PdfService.readFile(invoiceTemplatePath);
+            let allRepairs = []
+            if(repair.repairs.todo)allRepairs = allRepairs.concat(repair.repairs.todo)
+            if(repair.repairs.inprogress)allRepairs= allRepairs.concat(repair.repairs.inprogress)
+            if(repair.repairs.ended)allRepairs= allRepairs.concat(repair.repairs.ended)
+            fileContent = this.mapTemplateData(fileContent, {
+                repair, car, user,
+                reparationElmtsDada: PdfService.generateReparationElmtsData(allRepairs)
+            }); 
+            let stream = await PdfService.createPdf(fileContent);
 
-        return stream;
+            return stream;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
 
     }
 }
