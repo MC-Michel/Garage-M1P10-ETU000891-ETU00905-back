@@ -65,7 +65,6 @@ module.exports = class PdfService {
     }
     static async generateInvoice(repairId){
         try {
-            console.log(invoiceTemplatePath);
             let repair = await repairHistoryRepository.findById(repairId);
             if(repair == null) repair = await  carRepository.findCurrentRepair(repairId);
             if (repair == null) throw new CustomError(`Aucune reparation correspondant a l'id ${repairId}`);
