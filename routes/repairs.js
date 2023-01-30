@@ -31,6 +31,7 @@ const repairRepository = new GenRepository(Repair);
 // }
 
 const createInvoice = async function (req, res){
+  console.log("Create invoice");
   const repairId = req.params.repairId;
   const invoiceStream = await PdfService.generateInvoice(repairId);
   res.attachment('facture.pdf');
